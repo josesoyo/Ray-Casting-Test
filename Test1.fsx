@@ -1,6 +1,6 @@
-﻿#r @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\RayCasting_Mesh_test\packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll"
-#r @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\RayCasting_Mesh_test\packages\MathNet.Numerics.Signed.3.7.0\lib\net40\MathNet.Numerics.dll"
-#r @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\RayCasting_Mesh_test\packages\MathNet.Numerics.FSharp.Signed.3.7.0\lib\net40\MathNet.Numerics.FSharp.dll"
+﻿#r @"packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll"
+#r @"packages\MathNet.Numerics.Signed.3.7.0\lib\net40\MathNet.Numerics.dll"
+#r @"packages\MathNet.Numerics.FSharp.Signed.3.7.0\lib\net40\MathNet.Numerics.FSharp.dll"
 
 #load "RayCore.fs"
 #load "RayColor.fs"
