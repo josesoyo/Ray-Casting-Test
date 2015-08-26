@@ -1,0 +1,1429 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MathNet.Spatial</name>
+    </assembly>
+    <members>
+        <member name="T:MathNet.Spatial.Euclidean.Matrix2D">
+            <summary>
+            Helper class for creating matrices for manipulating 2D-elements
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Matrix2D.Rotation(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Creates a rotation about the z-axis
+            </summary>
+            <param name="rotation"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Matrix2D.Create(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Creates an arbitrary 2D transform
+            </summary>
+            <param name="m11"></param>
+            <param name="m12"></param>
+            <param name="m21"></param>
+            <param name="m22"></param>
+            <returns></returns>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Point2D.X">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Point2D.Y">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.#ctor(System.Double,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Creates a point r from origin rotated a counterclockwise from X-Axis
+            </summary>
+            <param name="r"></param>
+            <param name="a"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.GetSchema">
+            <summary>
+            This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class.
+            </summary>
+            <returns>
+            An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
+            </returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.ReadXml(System.Xml.XmlReader)">
+            <summary>
+            Generates an object from its XML representation.
+            Handles both attribute and element style
+            </summary>
+            <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.WriteXml(System.Xml.XmlWriter)">
+            <summary>
+            Converts an object into its XML representation.
+            </summary>
+            <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.ToPoint3D">
+            <summary>
+            return new Point3D(X, Y, 0);
+            </summary>
+            <returns>return new Point3D(X, Y, 0);</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.TransformBy(MathNet.Spatial.Euclidean.CoordinateSystem)">
+             <summary>
+            
+             </summary>
+             <param name="cs"></param>
+             <returns>return cs.Transform(this.ToPoint3D());</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.OfVector(MathNet.Numerics.LinearAlgebra.Vector{System.Double})">
+            <summary>
+            Create a new Point2D from a Math.NET Numerics vector of length 2.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point2D.ToVector">
+            <summary>
+            Convert to a Math.NET Numerics dense vector of length 2.
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Vector2D.X">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Vector2D.Y">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector2D.#ctor(System.Double,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Creates a vector with length r rotated a counterclockwise from X-Axis
+            </summary>
+            <param name="r">The radius</param>
+            <param name="a">The angle</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector2D.GetSchema">
+            <summary>
+            This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class.
+            </summary>
+            <returns>
+            An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
+            </returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector2D.ReadXml(System.Xml.XmlReader)">
+            <summary>
+            Generates an object from its XML representation.
+            Handles both attribute and element style
+            </summary>
+            <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector2D.WriteXml(System.Xml.XmlWriter)">
+            <summary>
+            Converts an object into its XML representation.
+            </summary>
+            <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector2D.SignedAngleTo(MathNet.Spatial.Euclidean.Vector2D,System.Boolean,System.Boolean)">
+             <summary>
+            
+             </summary>
+             <param name="v2"></param>
+             <param name="clockWise">Positive in clockwisedirection</param>
+             <param name="returnNegative">If angle is > 180° a negative value is returned</param>
+             <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector2D.OfVector(MathNet.Numerics.LinearAlgebra.Vector{System.Double})">
+            <summary>
+            Create a new Vector2D from a Math.NET Numerics vector of length 2.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector2D.ToVector">
+            <summary>
+            Convert to a Math.NET Numerics dense vector of length 2.
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Point3DHomogeneous.X">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Point3DHomogeneous.Y">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Point3DHomogeneous.Z">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Point3DHomogeneous.W">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Projective.Point3DHomogeneous.OfVector(MathNet.Numerics.LinearAlgebra.Vector{System.Double})">
+            <summary>
+            Create a new Point3D from a Math.NET Numerics vector of length 3.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Projective.Point3DHomogeneous.ToVector">
+            <summary>
+            Convert to a Math.NET Numerics dense vector of length 3.
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Vector3DHomogeneous.X">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Vector3DHomogeneous.Y">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Vector3DHomogeneous.Z">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Projective.Vector3DHomogeneous.W">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Projective.Vector3DHomogeneous.ToPoint3DHomogeneous">
+            <summary>
+            return new Point3DHomogeneous(this.X, this.Y, this.Z, this.W);
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Projective.Vector3DHomogeneous.OfVector(MathNet.Numerics.LinearAlgebra.Vector{System.Double})">
+            <summary>
+            Create a new Vector3DHomogeneous from a Math.NET Numerics vector of length 4.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Projective.Vector3DHomogeneous.ToVector">
+            <summary>
+            Convert to a Math.NET Numerics dense vector of length 4.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.RotateTo(MathNet.Spatial.Euclidean.UnitVector3D,MathNet.Spatial.Euclidean.UnitVector3D,System.Nullable{MathNet.Spatial.Euclidean.UnitVector3D})">
+            <summary>
+            Sets to the matrix of rotation that aligns the 'from' vector with the 'to' vector.
+            The optional Axis argument may be used when the two vectors are perpendicular and in opposite directions to specify a specific solution, but is otherwise ignored.
+            </summary>
+            <param name="fromVector3D">Input Vector object to align from.</param>
+            <param name="toVector3D">Input Vector object to align to.</param>
+            <param name="axis">Input Vector object. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Rotation``1(System.Double,``0,MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Creates a coordinate system that rotates 
+            </summary>
+            <param name="a">Angle to rotate</param>
+            <param name="unit">The unit of the angle</param>
+            <param name="v">Vector to rotate about</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Rotation``1(System.Double,``0,MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            Creates a coordinate system that rotates 
+            </summary>
+            <param name="a">Angle to rotate</param>
+            <param name="unit">The unit of the angle</param>
+            <param name="v">Vector to rotate about</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Rotation(MathNet.Spatial.Units.Angle,MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Creates a coordinate system that rotates 
+            </summary>
+            <param name="angle">Angle to rotate</param>
+            <param name="v">Vector to rotate about</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Rotation(MathNet.Spatial.Units.Angle,MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            Creates a coordinate system that rotates
+            </summary>
+            <param name="angle">Angle to rotate</param>
+            <param name="v">Vector to rotate about</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Rotation``1(System.Double,System.Double,System.Double,``0)">
+            <summary>
+            Rotation around Z (yaw) then around Y (pitch) and then around X (roll)
+            http://en.wikipedia.org/wiki/Aircraft_principal_axes
+            </summary>
+            <param name="yaw">Rotates around Z</param>
+            <param name="pitch">Rotates around Y</param>
+            <param name="roll">Rotates around X</param>
+            <param name="unit"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Rotation(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Rotation around Z (yaw) then around Y (pitch) and then around X (roll)
+            http://en.wikipedia.org/wiki/Aircraft_principal_axes
+            </summary>
+            <param name="yaw">Rotates around Z</param>
+            <param name="pitch">Rotates around Y</param>
+            <param name="roll">Rotates around X</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Yaw``1(System.Double,``0)">
+            <summary>
+            Rotates around Z
+            </summary>
+            <param name="a"></param>
+            <param name="unit"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Yaw(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Rotates around Z
+            </summary>
+            <param name="av"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Pitch``1(System.Double,``0)">
+            <summary>
+            Rotates around Y
+            </summary>
+            <param name="a"></param>
+            <param name="unit"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Pitch(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Rotates around Y
+            </summary>
+            <param name="av"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Roll``1(System.Double,``0)">
+            <summary>
+            Rotates around X
+            </summary>
+            <param name="a"></param>
+            <param name="unit"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Roll(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Rotates around X
+            </summary>
+            <param name="av"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.CreateMappingCoordinateSystem(MathNet.Spatial.Euclidean.CoordinateSystem,MathNet.Spatial.Euclidean.CoordinateSystem)">
+            <summary>
+            Creates a coordinate system that maps from the 'from' coordinate system to the 'to' coordinate system.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.SetToAlignCoordinateSystems(MathNet.Spatial.Euclidean.Point3D,MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.Point3D,MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            Sets this matrix to be the matrix that maps from the 'from' coordinate system to the 'to' coordinate system.
+            </summary>
+            <param name="fromOrigin">Input Point3D that defines the origin to map the coordinate system from.</param>
+            <param name="fromXAxis">Input Vector3D object that defines the X-axis to map the coordinate system from.</param>
+            <param name="fromYAxis">Input Vector3D object that defines the Y-axis to map the coordinate system from.</param>
+            <param name="fromZAxis">Input Vector3D object that defines the Z-axis to map the coordinate system from.</param>
+            <param name="toOrigin">Input Point3D object that defines the origin to map the coordinate system to.</param>
+            <param name="toXAxis">Input Vector3D object that defines the X-axis to map the coordinate system to.</param>
+            <param name="toYAxis">Input Vector3D object that defines the Y-axis to map the coordinate system to.</param>
+            <param name="toZAxis">Input Vector3D object that defines the Z-axis to map the coordinate system to.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Translation(MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            Creates a translation
+            </summary>
+            <param name="translation"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.SetRotationSubMatrix(MathNet.Numerics.LinearAlgebra.Matrix{System.Double},MathNet.Spatial.Euclidean.CoordinateSystem)">
+             <summary>
+            
+             </summary>
+             <param name="r">A 3×3 matrix with the rotation portion</param>
+             <param name="coordinateSystem"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.ResetRotations">
+            <summary>
+            Resets rotations preserves scales
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Transform(MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            Transforms a vector and returns the transformed vector
+            </summary>
+            <param name="v"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Transform(MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Transforms a vector and returns the transformed vector
+            </summary>
+            <param name="v"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Transform(MathNet.Spatial.Euclidean.Point3D)">
+            <summary>
+            Transforms a point and returns the transformed point
+            </summary>
+            <param name="p"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Transform(MathNet.Spatial.Euclidean.CoordinateSystem)">
+            <summary>
+            Transforms a coordinate system and returns the transformed
+            </summary>
+            <param name="cs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Transform(MathNet.Spatial.Euclidean.Line3D)">
+            <summary>
+            Transforms a line and returns the transformed.
+            </summary>
+            <param name="l"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.Transform(MathNet.Spatial.Euclidean.Ray3D)">
+            <summary>
+            Transforms a ray and returns the transformed.
+            </summary>
+            <param name="ray"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.CoordinateSystem.TransformBy(MathNet.Spatial.Euclidean.CoordinateSystem)">
+            <summary>
+            Transfomes this by the coordinate system and returns the tranformed.
+            </summary>
+            <param name="cs"></param>
+            <returns></returns>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.CoordinateSystem.BaseChangeMatrix">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:MathNet.Spatial.Euclidean.Line3D">
+            <summary>
+            A line between two points
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Line3D.StartPoint">
+            <summary>
+            The startpoint of the line
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Line3D.EndPoint">
+            <summary>
+            The endpoint of the line
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Line3D.#ctor(MathNet.Spatial.Euclidean.Point3D,MathNet.Spatial.Euclidean.Point3D)">
+            <summary>
+            Throws if StartPoint == EndPoint
+            </summary>
+            <param name="startPoint"></param>
+            <param name="endPoint"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Line3D.Parse(System.String,System.String)">
+            <summary>
+            Creates a Line from its string representation
+            </summary>
+            <param name="startPoint">The string representation of the startpoint</param>
+            <param name="endPoint">The string representation of the endpoint</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Line3D.LineTo(MathNet.Spatial.Euclidean.Point3D,System.Boolean)">
+            <summary>
+            Returns the shortes line to a point
+            </summary>
+            <param name="p"></param>
+            <param name="mustStartBetweenStartAndEnd">If false the startpoint can be on the line extending beyond the start and endpoint of the line</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Line3D.ProjectOn(MathNet.Spatial.Euclidean.Plane)">
+            <summary>
+            The line projected on a plane
+            </summary>
+            <param name="plane"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Line3D.Equals(MathNet.Spatial.Euclidean.Line3D)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An object to compare with this object.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Line3D.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
+            </summary>
+            <returns>
+            true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>; otherwise, false.
+            </returns>
+            <param name="obj">The <see cref="T:System.Object"/> to compare with the current <see cref="T:System.Object"/>. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Line3D.GetHashCode">
+            <summary>
+            Serves as a hash function for a particular type. 
+            </summary>
+            <returns>
+            A hash code for the current <see cref="T:System.Object"/>.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Line3D.Length">
+            <summary>
+            Distance from startpoint to endpoint, the length of the line
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Line3D.Direction">
+            <summary>
+            The direction from the startpoint to the endpoint
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.Parse(System.String)">
+            <summary>
+            Creates a Plane from its string representation
+            </summary>
+            <param name="s">The string representation of the Plane</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.Project(MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            Project Vector3D onto this plane
+            </summary>
+            <param name="vector3DToProject">The Vector3D to project</param>
+            <returns>The projected Vector3D</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.Project(MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Project Vector3D onto this plane
+            </summary>
+            <param name="vector3DToProject">The Vector3D to project</param>
+            <returns>The projected Vector3D</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.IntersectionWith(MathNet.Spatial.Euclidean.Plane,System.Double)">
+            <summary>
+            Finds the intersection of the two planes, throws if they are parallel
+            http://mathworld.wolfram.com/Plane-PlaneIntersection.html
+            </summary>
+            <param name="intersectingPlane"></param>
+            <param name="tolerance"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.IntersectionWith(MathNet.Spatial.Euclidean.Ray3D,System.Double)">
+            <summary>
+            http://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
+            </summary>
+            <param name="ray"></param>
+            <param name="tolerance"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.Equals(MathNet.Spatial.Euclidean.Plane)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+            <param name="other">An object to compare with this object.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>.
+            </summary>
+            <returns>
+            true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:System.Object"/>; otherwise, false.
+            </returns>
+            <param name="obj">The <see cref="T:System.Object"/> to compare with the current <see cref="T:System.Object"/>. </param><filterpriority>2</filterpriority>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Plane.GetHashCode">
+            <summary>
+            Serves as a hash function for a particular type.
+            </summary>
+            <returns>
+            A hash code for the current <see cref="T:System.Object"/>.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Point3D.X">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Point3D.Y">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Point3D.Z">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point3D.Parse(System.String)">
+            <summary>
+            Creates a Point3D from its string representation
+            </summary>
+            <param name="s">The string representation of the Point3D</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point3D.GetSchema">
+            <summary>
+            This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class.
+            </summary>
+            <returns>
+            An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
+            </returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point3D.ReadXml(System.Xml.XmlReader)">
+            <summary>
+            Generates an object from its XML representation.
+            </summary>
+            <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point3D.WriteXml(System.Xml.XmlWriter)">
+            <summary>
+            Converts an object into its XML representation.
+            </summary>
+            <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point3D.OfVector(MathNet.Numerics.LinearAlgebra.Vector{System.Double})">
+            <summary>
+            Create a new Point3D from a Math.NET Numerics vector of length 3.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Point3D.ToVector">
+            <summary>
+            Convert to a Math.NET Numerics dense vector of length 3.
+            </summary>
+        </member>
+        <member name="T:MathNet.Spatial.Euclidean.Quaternion">
+            <summary>Quaternion Number</summary>
+            <remarks>
+            http://en.wikipedia.org/wiki/Quaternion
+            </remarks>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.#ctor(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Initializes a new instance of the Quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Initializes a new instance of the Quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Scalar">
+            <summary>
+            Returns a new Quaternion q with the Scalar part only.
+            If you need a Double, use the Real-Field instead.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Vector">
+            <summary>
+            Returns a new Quaternion q with the Vector part only.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.UnitVector">
+            <summary>
+            Returns a new normalized Quaternion u with the Vector part only, such that ||u|| = 1.
+            Q may then be represented as q = r*(cos(phi) + u * sin(phi)) = r*exp(phi*u) where r is the absolute and phi the argument of q.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Sign">
+            <summary>
+            Returns a new normalized Quaternion q with the direction of this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_UnaryPlus(MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            (nop)
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_UnaryNegation(MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Negate a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Addition(MathNet.Spatial.Euclidean.Quaternion,MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Add a quaternion to a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Addition(MathNet.Spatial.Euclidean.Quaternion,System.Double)">
+            <summary>
+            Add a floating point number to a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Subtraction(MathNet.Spatial.Euclidean.Quaternion,MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Subtract a quaternion from a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Subtraction(MathNet.Spatial.Euclidean.Quaternion,System.Double)">
+            <summary>
+            Subtract a floating point number from a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Multiply(MathNet.Spatial.Euclidean.Quaternion,MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Multiply a quaternion with a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Multiply(MathNet.Spatial.Euclidean.Quaternion,System.Double)">
+            <summary>
+            Multiply a floating point number with a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Division(MathNet.Spatial.Euclidean.Quaternion,MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Divide a quaternion by a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Division(MathNet.Spatial.Euclidean.Quaternion,System.Double)">
+            <summary>
+            Divide a quaternion by a floating point number.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_ExclusiveOr(MathNet.Spatial.Euclidean.Quaternion,MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Raise a quaternion to a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_ExclusiveOr(MathNet.Spatial.Euclidean.Quaternion,System.Double)">
+            <summary>
+            Raise a quaternion to a floating point number.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.op_Implicit(System.Double)~MathNet.Spatial.Euclidean.Quaternion">
+            <summary>
+            Convert a floating point number to a quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Add(MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Add a quaternion to this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Add(System.Double)">
+            <summary>
+            Add a floating point number to this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Subtract(MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Subtract a quaternion from this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Subtract(System.Double)">
+            <summary>
+            Subtract a floating point number from this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Negate">
+            <summary>
+            Negate this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Multiply(MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Multiply a quaternion with this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Multiply(System.Double)">
+            <summary>
+            Multiply a floating point number to this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Divide(MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Multiplies a Quaternion with the inverse of another
+            Quaternion (q*q<sup>-1</sup>). Note that for Quaternions
+            q*q<sup>-1</sup> is not the same then q<sup>-1</sup>*q,
+            because this will lead to a rotation in the other direction.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Divide(System.Double)">
+            <summary>
+            Multiplies a Quaternion with the inverse of a real number.
+            </summary>
+            <remarks>
+            Its also possible to cast a double to a Quaternion and make the division
+            afterward, but that would be more expensive.
+            </remarks>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Inverse">
+            <summary>
+            Inverts this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Distance(MathNet.Spatial.Euclidean.Quaternion,MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Returns the distance |a-b| of two quaternions, forming a metric space.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Conjugate">
+            <summary>
+            Conjugate this quaternion.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Log(System.Double)">
+            <summary>
+            Logarithm to a given base.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Ln">
+            <summary>
+            Natural Logarithm to base E.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Lg">
+            <summary>
+            Common Logarithm to base 10.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Exp">
+            <summary>
+            Exponential Function.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Pow(System.Double)">
+            <summary>
+            Raise the quaternion to a given power.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Pow(MathNet.Spatial.Euclidean.Quaternion)">
+            <summary>
+            Raise the quaternion to a given power.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Sqr">
+            <summary>
+            Square of the Quaternion q: q^2.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Quaternion.Sqrt">
+            <summary>
+            Square root of the Quaternion: q^(1/2).
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.Real">
+            <summary>
+            Gets the real part of the quaternion.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.ImagX">
+            <summary>
+            Gets the imaginary X part (coefficient of complex I) of the quaternion.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.ImagY">
+            <summary>
+            Gets the imaginary Y part (coefficient of complex J) of the quaternion.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.ImagZ">
+            <summary>
+            Gets the imaginary Z part (coefficient of complex K) of the quaternion.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.Abs">
+            <summary>
+            Gets the standard euclidean length |q| = sqrt(||q||) of the quaternion q: the
+            square root of the sum of the squares of the four components. Q may then be
+            represented as q = r*(cos(phi) + u * sin(phi)) = r*exp(phi*u) where u is the
+            unit vector and phi the argument of q.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.Norm">
+            <summary>
+            Gets the norm ||q|| = |q|^2 of the quaternion q: the sum of the squares of the four components.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.Arg">
+            <summary>
+            Gets the argument phi = arg(q) of the quaternion q, such that q = r*(cos(phi) +
+            u * sin(phi)) = r*exp(phi*u) where r is the absolute and u the unit vector of
+            q.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Quaternion.IsUnitQuaternion">
+            <summary>
+            True if the quaternion q is of length |q| = 1.
+            </summary>
+            <remarks>
+            To normalize a quaternion to a length of 1, use the <see cref="M:MathNet.Spatial.Euclidean.Quaternion.Sign"/> method.
+            All unit quaternions form a 3-sphere.
+            </remarks>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Ray3D.IntersectionOf(MathNet.Spatial.Euclidean.Plane,MathNet.Spatial.Euclidean.Plane)">
+            <summary>
+            The intersection of the two planes
+            </summary>
+            <param name="plane1"></param>
+            <param name="plane2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Ray3D.Parse(System.String,System.String)">
+            <summary>
+            Parses string representation of throughpoint and direction
+            This is mainly meant for tests
+            </summary>
+            <param name="point"></param>
+            <param name="direction"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Ray3D.Parse(System.String)">
+            <summary>
+            Parses a string in the format: 'p:{1, 2, 3} v:{0, 0, 1}' to a Ray3D
+            This is mainly meant for tests
+            </summary>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Ray3D.LineTo(MathNet.Spatial.Euclidean.Point3D)">
+            <summary>
+            Returns the shortes line from a point to the ray
+            </summary>
+            <param name="point3D"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Ray3D.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Matrix3D.RotationTo(MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.Vector3D,System.Nullable{MathNet.Spatial.Euclidean.UnitVector3D})">
+            <summary>
+            Sets to the matrix of rotation that would align the 'from' vector with the 'to' vector. 
+            The optional Axis argument may be used when the two vectors are perpendicular and in opposite directions to specify a specific solution, but is otherwise ignored.
+            </summary>
+            <param name="fromVector">Input Vector object to align from.</param>
+            <param name="toVector">Input Vector object to align to.</param>
+            <param name="axis">Input Vector object. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Matrix3D.RotationTo(MathNet.Spatial.Euclidean.UnitVector3D,MathNet.Spatial.Euclidean.UnitVector3D,System.Nullable{MathNet.Spatial.Euclidean.UnitVector3D})">
+            <summary>
+            Sets to the matrix of rotation that would align the 'from' vector with the 'to' vector. 
+            The optional Axis argument may be used when the two vectors are perpendicular and in opposite directions to specify a specific solution, but is otherwise ignored.
+            </summary>
+            <param name="fromVector">Input Vector object to align from.</param>
+            <param name="toVector">Input Vector object to align to.</param>
+            <param name="axis">Input Vector object. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Matrix3D.RotationAroundArbitraryVector``1(MathNet.Spatial.Euclidean.UnitVector3D,System.Double,``0)">
+            <summary>
+            
+            </summary>
+            <param name="aboutVector"></param>
+            <param name="angle">Angle in degrees</param>
+            <param name="angleUnit"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MathNet.Spatial.Euclidean.UnitVector3D">
+            <summary>
+            A unit vector, this is used to describe a direction in 3D
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.UnitVector3D.X">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.UnitVector3D.Y">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.UnitVector3D.Z">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.Parse(System.String)">
+            <summary>
+            Creates a UnitVector3D from its string representation
+            </summary>
+            <param name="s">The string representation of the UnitVector3D</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.GetSchema">
+            <summary>
+            This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class.
+            </summary>
+            <returns>
+            An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
+            </returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.ReadXml(System.Xml.XmlReader)">
+            <summary>
+            Generates an object from its XML representation.
+            </summary>
+            <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.WriteXml(System.Xml.XmlWriter)">
+            <summary>
+            Converts an object into its XML representation.
+            </summary>
+            <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.SignedAngleTo(MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Returns signed angle
+            </summary>
+            <param name="v">The fromVector3D to calculate the signed angle to </param>
+            <param name="about">The vector around which to rotate to get the correct sign</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.SignedAngleTo(MathNet.Spatial.Euclidean.UnitVector3D,MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Returns signed angle
+            </summary>
+            <param name="v">The fromVector3D to calculate the signed angle to </param>
+            <param name="about">The vector around which to rotate to get the correct sign</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.AngleTo(MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            The nearest angle between the vectors
+            </summary>
+            <param name="v">The other vector</param>
+            <returns>The angle</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.AngleTo(MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            The nearest angle between the vectors
+            </summary>
+            <param name="v">The other vector</param>
+            <returns>The angle</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.Rotate``1(MathNet.Spatial.Euclidean.UnitVector3D,System.Double,``0)">
+            <summary>
+            Returns a vector that is this vector rotated the signed angle around the about vector
+            </summary>
+            <param name="about"></param>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.Rotate(MathNet.Spatial.Euclidean.UnitVector3D,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Returns a vector that is this vector rotated the signed angle around the about vector
+            </summary>
+            <param name="about"></param>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.UnitVector3D.ToVector">
+            <summary>
+            Convert to a Math.NET Numerics dense vector of length 3.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.UnitVector3D.Orthogonal">
+            <summary>
+            A vector orthogonbal to this
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.UnitVector3D.Length">
+            <summary>
+            The length of the vector not the count of elements
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Vector3D.X">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Vector3D.Y">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Euclidean.Vector3D.Z">
+            <summary>
+            Using public fields cos: http://blogs.msdn.com/b/ricom/archive/2006/08/31/performance-quiz-11-ten-questions-on-value-based-programming.aspx
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.Parse(System.String)">
+            <summary>
+            Creates a Vector3D from its string representation
+            </summary>
+            <param name="s">The string representation of the Vector3D</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.GetSchema">
+            <summary>
+            This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class.
+            </summary>
+            <returns>
+            An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
+            </returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.ReadXml(System.Xml.XmlReader)">
+            <summary>
+            Generates an object from its XML representation.
+            </summary>
+            <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.WriteXml(System.Xml.XmlWriter)">
+            <summary>
+            Converts an object into its XML representation.
+            </summary>
+            <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.SignedAngleTo(MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Returns signed angle
+            </summary>
+            <param name="v">The vector to calculate the signed angle to </param>
+            <param name="about">The vector around which to rotate to get the correct sign</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.SignedAngleTo(MathNet.Spatial.Euclidean.UnitVector3D,MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            Returns signed angle
+            </summary>
+            <param name="v">The vector to calculate the signed angle to </param>
+            <param name="about">The vector around which to rotate to get the correct sign</param>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.AngleTo(MathNet.Spatial.Euclidean.Vector3D)">
+            <summary>
+            The nearest angle between the vectors
+            </summary>
+            <param name="v">The other vector</param>
+            <returns>The angle</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.AngleTo(MathNet.Spatial.Euclidean.UnitVector3D)">
+            <summary>
+            The nearest angle between the vectors
+            </summary>
+            <param name="v">The other vector</param>
+            <returns>The angle</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.Rotate``1(MathNet.Spatial.Euclidean.UnitVector3D,System.Double,``0)">
+            <summary>
+            Returns a vector that is this vector rotated the signed angle around the about vector
+            </summary>
+            <typeparam name="T">Constraining it like this does not box</typeparam>
+            <param name="about"></param>
+            <param name="angle"></param>
+            <param name="angleUnit"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.Rotate(MathNet.Spatial.Euclidean.Vector3D,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Returns a vector that is this vector rotated the signed angle around the about vector
+            </summary>
+            <param name="about"></param>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.Rotate(MathNet.Spatial.Euclidean.UnitVector3D,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Returns a vector that is this vector rotated the signed angle around the about vector
+            </summary>
+            <param name="about"></param>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.ToPoint3D">
+            <summary>
+            return new Point3D(this.X, this.Y, this.Z);
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.TransformBy(MathNet.Spatial.Euclidean.CoordinateSystem)">
+            <summary>
+            Transforms the vector by a coordinate system and returns the transformed.
+            </summary>
+            <param name="coordinateSystem"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.OfVector(MathNet.Numerics.LinearAlgebra.Vector{System.Double})">
+            <summary>
+            Create a new Vector3D from a Math.NET Numerics vector of length 3.
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Euclidean.Vector3D.ToVector">
+            <summary>
+            Convert to a Math.NET Numerics dense vector of length 3.
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Vector3D.Length">
+            <summary>
+            The length of the vector not the count of elements
+            </summary>
+        </member>
+        <member name="P:MathNet.Spatial.Euclidean.Vector3D.Orthogonal">
+            <summary>
+            A vector orthogonbal to this
+            </summary>
+        </member>
+        <member name="T:MathNet.Spatial.Units.Angle">
+            <summary>
+            An angle
+            </summary>
+        </member>
+        <member name="F:MathNet.Spatial.Units.Angle.Radians">
+            <summary>
+            The value in radians
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.#ctor(System.Double,MathNet.Spatial.Units.Radians)">
+            <summary>
+            Initializes a new instance of the Angle.
+            </summary>
+            <param name="radians"></param>
+            <param name="unit"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.#ctor(System.Double,MathNet.Spatial.Units.Degrees)">
+            <summary>
+            Initializes a new instance of the Angle.
+            </summary>
+            <param name="value"></param>
+            <param name="unit"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.Parse(System.String)">
+            <summary>
+            Creates an Angle from its string representation
+            </summary>
+            <param name="s">The string representation of the angle</param>
+            <returns></returns>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.From``1(System.Double,``0)">
+            <summary>
+            Creates a new instance of Angle.
+            </summary>
+            <param name="value"></param>
+            <param name="unit"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.FromDegrees(System.Double)">
+            <summary>
+            Creates a new instance of Angle.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.FromRadians(System.Double)">
+            <summary>
+            Creates a new instance of Angle.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_Equality(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Indicates whether two <see cref="T:MathNet.Spatial.Units.Angle"/> instances are equal.
+            </summary>
+            <returns>
+            true if the values of <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, false.
+            </returns>
+            <param name="left">A <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+            <param name="right">A <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_Inequality(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Indicates whether two <see cref="T:MathNet.Spatial.Units.Angle"/> instances are not equal.
+            </summary>
+            <returns>
+            true if the values of <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, false.
+            </returns>
+            <param name="left">A <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+            <param name="right">A <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_LessThan(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Indicates whether a specified <see cref="T:MathNet.Spatial.Units.Angle"/> is less than another specified <see cref="T:MathNet.Spatial.Units.Angle"/>.
+            </summary>
+            <returns>
+            true if the value of <paramref name="left"/> is less than the value of <paramref name="right"/>; otherwise, false. 
+            </returns>
+            <param name="left">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+            <param name="right">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_GreaterThan(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Indicates whether a specified <see cref="T:MathNet.Spatial.Units.Angle"/> is greater than another specified <see cref="T:MathNet.Spatial.Units.Angle"/>.
+            </summary>
+            <returns>
+            true if the value of <paramref name="left"/> is greater than the value of <paramref name="right"/>; otherwise, false. 
+            </returns>
+            <param name="left">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+            <param name="right">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_LessThanOrEqual(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Indicates whether a specified <see cref="T:MathNet.Spatial.Units.Angle"/> is less than or equal to another specified <see cref="T:MathNet.Spatial.Units.Angle"/>.
+            </summary>
+            <returns>
+            true if the value of <paramref name="left"/> is less than or equal to the value of <paramref name="right"/>; otherwise, false.
+            </returns>
+            <param name="left">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+            <param name="right">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_GreaterThanOrEqual(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Indicates whether a specified <see cref="T:MathNet.Spatial.Units.Angle"/> is greater than or equal to another specified <see cref="T:MathNet.Spatial.Units.Angle"/>.
+            </summary>
+            <returns>
+            true if the value of <paramref name="left"/> is greater than or equal to the value of <paramref name="right"/>; otherwise, false.
+            </returns>
+            <param name="left">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+            <param name="right">An <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_Multiply(System.Double,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Multiplies an instance of <see cref="T:MathNet.Spatial.Units.Angle"/> with <paramref name="left"/> and returns the result.
+            </summary>
+            <param name="right">An instance of <see cref="T:MathNet.Spatial.Units.Angle"/></param>
+            <param name="left">An instance of <seealso cref="T:System.Double"/></param>
+            <returns>Multiplies an instance of <see cref="T:MathNet.Spatial.Units.Angle"/> with <paramref name="left"/> and returns the result.</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_Multiply(MathNet.Spatial.Units.Angle,System.Double)">
+            <summary>
+            Multiplies an instance of <see cref="T:MathNet.Spatial.Units.Angle"/> with <paramref name="right"/> and returns the result.
+            </summary>
+            <param name="left">An instance of <see cref="T:MathNet.Spatial.Units.Angle"/></param>
+            <param name="right">An instance of <seealso cref="T:System.Double"/></param>
+            <returns>Multiplies an instance of <see cref="T:MathNet.Spatial.Units.Angle"/> with <paramref name="right"/> and returns the result.</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_Division(MathNet.Spatial.Units.Angle,System.Double)">
+            <summary>
+            Divides an instance of <see cref="T:MathNet.Spatial.Units.Angle"/> with <paramref name="right"/> and returns the result.
+            </summary>
+            <param name="left">An instance of <see cref="T:MathNet.Spatial.Units.Angle"/></param>
+            <param name="right">An instance of <seealso cref="T:System.Double"/></param>
+            <returns>Divides an instance of <see cref="T:MathNet.Spatial.Units.Angle"/> with <paramref name="right"/> and returns the result.</returns>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_Addition(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Adds two specified <see cref="T:MathNet.Spatial.Units.Angle"/> instances.
+            </summary>
+            <returns>
+            An <see cref="T:MathNet.Spatial.Units.Angle"/> whose value is the sum of the values of <paramref name="left"/> and <paramref name="right"/>.
+            </returns>
+            <param name="left">A <see cref="T:MathNet.Spatial.Units.Angle"/>.</param>
+            <param name="right">A TimeSpan.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_Subtraction(MathNet.Spatial.Units.Angle,MathNet.Spatial.Units.Angle)">
+            <summary>
+            Subtracts an angle from another angle and returns the difference.
+            </summary>
+            <returns>
+            An <see cref="T:MathNet.Spatial.Units.Angle"/> that is the difference
+            </returns>
+            <param name="left">A <see cref="T:MathNet.Spatial.Units.Angle"/> (the minuend).</param>
+            <param name="right">A <see cref="T:MathNet.Spatial.Units.Angle"/> (the subtrahend).</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_UnaryNegation(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Returns an <see cref="T:MathNet.Spatial.Units.Angle"/> whose value is the negated value of the specified instance.
+            </summary>
+            <returns>
+            An <see cref="T:MathNet.Spatial.Units.Angle"/> with the same numeric value as this instance, but the opposite sign.
+            </returns>
+            <param name="angle">A <see cref="T:MathNet.Spatial.Units.Angle"/></param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.op_UnaryPlus(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Returns the specified instance of <see cref="T:MathNet.Spatial.Units.Angle"/>.
+            </summary>
+            <returns>
+            Returns <paramref name="angle"/>.
+            </returns>
+            <param name="angle">A <see cref="T:MathNet.Spatial.Units.Angle"/></param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.CompareTo(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Compares this instance to a specified <see cref="T:MathNet.Spatial.Units.Angle"/> object and returns an integer that indicates whether this <see cref="!:instance"/> is shorter than, equal to, or longer than the <see cref="T:MathNet.Spatial.Units.Angle"/> object.
+            </summary>
+            <returns>
+            A signed number indicating the relative values of this instance and <paramref name="value"/>.
+            
+                                Value
+            
+                                Description
+            
+                                A negative integer
+            
+                                This instance is smaller than <paramref name="value"/>.
+            
+                                Zero
+            
+                                This instance is equal to <paramref name="value"/>.
+            
+                                A positive integer
+            
+                                This instance is larger than <paramref name="value"/>.
+            
+            </returns>
+            <param name="value">A <see cref="T:MathNet.Spatial.Units.Angle"/> object to compare to this instance.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.Equals(MathNet.Spatial.Units.Angle)">
+            <summary>
+            Returns a value indicating whether this instance is equal to a specified <see cref="T:MathNet.Spatial.Units.Angle"/> object.
+            </summary>
+            <returns>
+            true if <paramref name="other"/> represents the same angle as this instance; otherwise, false.
+            </returns>
+            <param name="other">An <see cref="T:MathNet.Spatial.Units.Angle"/> object to compare with this instance.</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.Equals(MathNet.Spatial.Units.Angle,System.Double)">
+            <summary>
+            Returns a value indicating whether this instance is equal to a specified <see cref="T:MathNet.Spatial.Units.Angle"/> object within the given tolerance.
+            </summary>
+            <returns>
+            true if <paramref name="other"/> represents the same angle as this instance; otherwise, false.
+            </returns>
+            <param name="other">An <see cref="T:MathNet.Spatial.Units.Angle"/> object to compare with this instance.</param>
+            <param name="tolerance">The maximum difference for being considered equal</param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.GetSchema">
+            <summary>
+            This method is reserved and should not be used. When implementing the IXmlSerializable interface, 
+            you should return null (Nothing in Visual Basic) from this method, and instead, 
+            if specifying a custom schema is required, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class.
+            </summary>
+            <returns>
+            An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the
+             <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> 
+            method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
+            </returns>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.ReadXml(System.Xml.XmlReader)">
+            <summary>
+            Generates an object from its XML representation.
+            </summary>
+            <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.WriteXml(System.Xml.XmlWriter)">
+            <summary>
+            Converts an object into its XML representation.
+            </summary>
+            <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
+        </member>
+        <member name="M:MathNet.Spatial.Units.Angle.ReadFrom(System.Xml.XmlReader)">
+            <summary>
+            Reads an instance of <see cref="T:MathNet.Spatial.Units.Angle"/> from the <paramref name="reader"/>
+            </summary>
+            <param name="reader"></param>
+            <returns>An instance of  <see cref="T:MathNet.Spatial.Units.Angle"/></returns>
+        </member>
+        <member name="P:MathNet.Spatial.Units.Angle.Degrees">
+            <summary>
+            The value in degrees
+            </summary>
+        </member>
+        <member name="M:MathNet.Spatial.XmlExt.ReadAttributeOrDefault(System.Xml.Linq.XElement,System.String)">
+            <summary>
+            Reads attribute if it exists
+            
+            </summary>
+            <param name="e"/><param name="localName"/>
+            <returns/>
+        </member>
+    </members>
+</doc>
