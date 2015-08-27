@@ -20,6 +20,7 @@ open System.IO
 open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 
+open RayType
 open RayCore
 open RayColor
 
