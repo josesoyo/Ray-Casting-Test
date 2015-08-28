@@ -135,6 +135,6 @@ let img = new PictureBox(Dock=DockStyle.Fill)
 form.Controls.Add(img)
 
 img.Image <- bmp
-bmp.Save(@"C:\Users\JoseM\Desktop\test_all.jpg")
+//bmp.Save(@"C:\Users\JoseM\Desktop\test_all.jpg")
 
 

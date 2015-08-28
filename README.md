@@ -3,8 +3,11 @@ Render code written in F#.
 
 It can manage:
 
--Up to now it only works with Spheres
+-Works with a Sphere type and meshes .obj type
 
 -Multiple reflexions and transmissions included
 
-Instead of compiling the code, a script .fsx is prepared to de tests.
+
+
+Sample image obtained with the Test_AllScene.sx script
+!https://pbs.twimg.com/media/CNgJTYeWcAAiLTK.png!
