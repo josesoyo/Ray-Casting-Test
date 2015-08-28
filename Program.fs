@@ -20,9 +20,11 @@ open System.IO
 open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 
+open ObjReader
 open RayType
 open RayCore
 open RayColor
+
 
 
 
@@ -44,18 +46,24 @@ let light2 = {origin = Point3D(4.00,-1.20,-1.50);color=Color(1.0,1.0,1.0); inten
 
 //
 // scene
-// I define the plane and sphere
+// Materials
+let refractive= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.95,0.95,0.99);shinness= 60; R=0.01; T=0.99; n= 1.95} 
+let reflective ={DiffuseLight = Color(0.05,0.090,0.025);SpecularLight = Color(0.5,0.5,0.9);shinness= 60; R=0.950; T=0.0; n= 1.45} 
+let difus = {DiffuseLight = Color(0.25,0.90,0.25);SpecularLight = Color(0.5,0.5,0.9);shinness= 60; R=1.0; T=0.0; n= 1.45}
+// I define the spheres and meshes
 
-let pointWall = Point3D(0.0, 0.0, 10.0)
-let WallVect = UnitVector3D(0.0,0.0,1.0) 
-let Surf = Plane(pointWall, WallVect)
-let Wall = {surf=Surf; Color=0.6}
-let mat1= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.95,0.95,0.99);shinness= 60; R=0.01; T=0.99; n= 1.95} 
-let ball = {center=Point3D(0.70,-0.20,0.0); radius=0.250; material=mat1 }
-let mat2 ={DiffuseLight = Color(0.25,0.90,0.25);SpecularLight = Color(0.5,0.5,0.9);shinness= 60; R=1.0; T=0.0; n= 1.45} 
-let ball2 = {center=Point3D(10.0,-1.50,1.0); radius=1.965; material=mat2 }
-// Do the scene5
-let Scene = {Camera=camera ;Sphere = [ball;ball2]; EndWorld = Wall; Light=[light;light2]} 
+//Spheres
+let ball = {center=Point3D(0.70,-0.20,0.0); radius=0.250; material=refractive }
+let ball2 = {center=Point3D(10.0,-1.50,1.0); radius=1.965; material=reflective }
+// meshes
+let path = @"C:\Users\JoseM\OneDrive\Phd\render\Wavefront obj FileFormat\humanoid_tri.obj"
+//pyramid.obj" 
+//humanoid_tri.obj" 
+//gourd.obj"/
+let mesh1= ReadMeshWavefront(path,difus) |> fun x -> Scale x [0.5;0.5;0.5]|> fun x -> Translate x (Vector3D(5.0,0.0,-5.0))
+
+let all = {Meshes = [mesh1];Sphere = [ball;ball2]}
+let Scene = {Camera=camera ;World = all; Light=[light;light2]} 
 //ball;ball2;ball3;ball4;ball5
 // Scenario2
 (*
@@ -108,7 +116,8 @@ for i in 0..(PixNumW-1) do
             let Ray = {uvec=direct.Normalize(); length=direct.Length; from=camera.EyePoint; travelled=0.0 } //BAD
             //let Intersec = Surf.IntersectionWith(Ray.ray)
             //printfn "The intersection is at %f %f" Intersec.X Intersec.Y
-            let intersects = castRay (Scene, Ray)
+            //let intersects = castRay (Scene, Ray)
+            let intersects = CastRay_nest (Scene, Ray)
             match intersects with
             | [] -> bmp.SetPixel(i,j,Color.Gray)
             | _ ->  let color = GlobalIllum(intersects |>List.minBy(fun x -> x.t), Scene  )//colorAt (intersects |>List.minBy(fun x -> x.t), Scene  )

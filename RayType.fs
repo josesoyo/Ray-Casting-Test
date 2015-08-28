@@ -48,10 +48,14 @@ type material = {DiffuseLight:Color; SpecularLight:Color; shinness:int;R:float; 
 type light = {origin:Point3D; color:Color; intensity:float}
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
 type sphere = {center:Point3D; radius:float; material:material }
-type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres
-//type RayFrom = {ray:Ray3D; from:Point3D; travelled:float}
+//type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres
 type RayFrom = {uvec:UnitVector3D; length: float; from:Point3D; travelled:float}
+type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list}
+
+type world = {Meshes: mesh list;Sphere:sphere list}
+type scene = {Camera:cam; World:world; Light:light list} //I create a list of Spheres
 
 
 
-type Intersection = { normal:UnitVector3D; point:Point3D; ray:RayFrom; sphere:sphere;t:float}//; t:float }
+//type Intersection = { normal:UnitVector3D; point:Point3D; ray:RayFrom; sphere:sphere;t:float}//; t:float }
+type Intersection = { normal:UnitVector3D; point:Point3D; ray:RayFrom; material:material;t:float}

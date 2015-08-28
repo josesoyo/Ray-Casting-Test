@@ -31,18 +31,18 @@ let colorAt (intersection:Intersection,scn:scene )=
         //1.0
     let light = scn.Light
     let Ia = Color(0.05,0.05,0.05) //Should be defined with the scene
-    let AmbLight = Ia*intersection.sphere.material.DiffuseLight //Ia*Ka*Od
+    let AmbLight = Ia*intersection.material.DiffuseLight //Ia*Ka*Od
     let IsShadow intersection light =
         let LightDir = light.origin - intersection.point
         let RayLight = {uvec=LightDir.Normalize();length=LightDir.Length; from=intersection.point; travelled=intersection.ray.travelled}
-        let intersects = castRay (scn, RayLight)
+        let intersects = CastRay_nest (scn, RayLight)
         //printfn "there's an intersection at: %f" intersects.Head.ray.travelled
         match intersects with
             |[] -> true
             |_ ->  false
     // Diffuse
     let DiffLight intersection light    =
-        let KdOd = intersection.sphere.material.DiffuseLight
+        let KdOd = intersection.material.DiffuseLight
         let LightDir = light.origin - intersection.point
         let NormLightDir = LightDir.Normalize() //dir from point to light
         let Id = light.color* List.max([intersection.normal.DotProduct(NormLightDir);0.0])
@@ -52,12 +52,12 @@ let colorAt (intersection:Intersection,scn:scene )=
         else Color(0.0,0.0,0.0)
     //Specular
     let SpecLight intersection light =
-        let Ks =  intersection.sphere.material.SpecularLight //reflectance specular - MODIFY IT in FUTURE
+        let Ks =  intersection.material.SpecularLight //reflectance specular - MODIFY IT in FUTURE
         let LightDir = light.origin - intersection.point
         let NormLightDir = LightDir.Normalize() //dir from point to light
         let Rvect = intersection.normal.ScaleBy(2.0*intersection.normal.DotProduct(NormLightDir))-NormLightDir
         let DotProds = List.max([Rvect.DotProduct(intersection.ray.uvec.ScaleBy(-1.0));0.0])
-        let Is = light.color *pown DotProds intersection.sphere.material.shinness
+        let Is = light.color *pown DotProds intersection.material.shinness
         let fatt= Fatt intersection light
         if IsShadow intersection light then Ks*Is*fatt*light.intensity
         else Color(0.0,0.0,0.0)
@@ -78,15 +78,15 @@ let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int) =
     let NormLightDir = RayDir.Negate()//.ScaleBy(-1.0) //Inverse of the ray direction to reflect
     let ReflRayv = intersection.normal.ScaleBy(2.0*intersection.normal.DotProduct(NormLightDir))-NormLightDir //Reflected ray it's unit
     let ReflRay = {uvec=ReflRayv.Normalize(); length=ReflRayv.Length; from =intersection.point;travelled=intersection.ray.travelled}
-    let intersects = castRay (scene, ReflRay)
+    let intersects = CastRay_nest (scene, ReflRay)
     match intersects with
         |[] -> Color(0.0,0.0,0.0) // No reflection returns black             
         |_ -> let intersecMin = (intersects |>List.minBy(fun x -> x.t) ) //colorvar//Intersection
               let rcolor= colorAt(intersecMin, scene)
               let Depth = dpt + 1
-              let LenghtMax = 45.0
+              let LenghtMax = 400.0
               if intersection.ray.travelled < LenghtMax && Depth < 4 then 
-                let (T, R) = (intersection.sphere.material.T, intersection.sphere.material.R)
+                let (T, R) = (intersection.material.T, intersection.material.R)
                 
                 rcolor+ReflectedRay(intersecMin,scene,Depth)*R+TransmittedRay(intersecMin,scene,Depth)*T
               else
@@ -101,7 +101,7 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
         (-ci, 1./index) 
        else
         (ci, index)
-    let nu = intersection.sphere.material.n // With AIR
+    let nu = intersection.material.n // With AIR
     let ci = intersection.normal.DotProduct(LightDir) //Cosinus incident angle
     (*
     if ci < 0. then
@@ -125,17 +125,17 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
         let cos_trans = sqrt(1.-(inv_n*inv_n )*(1.-cos_inc*cos_inc)) // Cosinus transmited
         let vtrans = RayDir.ScaleBy(inv_n) - intersection.normal.ScaleBy(cos_trans - inv_n*cos_inc)
         let TransRay = {uvec=vtrans.Normalize();length=vtrans.Length; from =intersection.point;travelled=intersection.ray.travelled}
-        let intersects = castRay (scene, TransRay)
+        let intersects = CastRay_nest (scene, TransRay)
         match intersects with
             |[] -> Color(0.0,0.0,0.0)
             |_ -> let intersecMin = (intersects |>List.minBy(fun x -> x.t) )
                   let tcolor = colorAt(intersecMin, scene)
                   let Depth = dpt + 1 //Idem as reflected
-                  let LenghtMax = 45.0
+                  let LenghtMax = 400.0
                   if intersection.ray.travelled < LenghtMax && Depth < 4 then
-                      let (T, R) = (intersection.sphere.material.T, intersection.sphere.material.R)
-                      
-                      tcolor + TransmittedRay(intersecMin,scene,Depth)*T + ReflectedRay(intersecMin,scene,Depth)*R
+                      let (T, R) = (intersection.material.T, intersection.material.R)
+                      if T=0. then tcolor + ReflectedRay(intersecMin,scene,Depth)*R // Don't do trans f not trans next collision
+                      else tcolor + TransmittedRay(intersecMin,scene,Depth)*T + ReflectedRay(intersecMin,scene,Depth)*R
                   else
                       tcolor
     else
@@ -143,6 +143,6 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
  
 let GlobalIllum (intersection:Intersection, scene:scene) =
     let DirColor = colorAt(intersection, scene) //First  direct color
-    let RefColor = ReflectedRay (intersection,scene,0)*intersection.sphere.material.R // Generate ray reflected
-    let TransColor = TransmittedRay (intersection,scene,0)*intersection.sphere.material.T //Generate Ray transmited
+    let RefColor = ReflectedRay (intersection,scene,0)*intersection.material.R // Generate ray reflected
+    let TransColor = TransmittedRay (intersection,scene,0)*intersection.material.T //Generate Ray transmited
     DirColor+RefColor+ TransColor
