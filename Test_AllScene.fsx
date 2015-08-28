@@ -10,7 +10,7 @@
 #load "ObjReader.fs"
 
 
-
+open System.IO
 open System.Windows.Forms
 open System.Drawing
 open MathNet.Numerics.LinearAlgebra
@@ -56,11 +56,12 @@ let ball = {center=Point3D(0.70,0.20,0.0); radius=0.250; material=refractive }
 let ball2 = {center=Point3D(10.0,-1.50,1.0); radius=1.965; material=reflective }
 //let ball3 = {center = Point3D(3.8125, 0.38, 1.5); radius = 1. ; material= difus}
 // meshes
-let path = @"C:\Users\JoseM\OneDrive\Phd\render\Wavefront obj FileFormat\humanoid_tri.obj"
-let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\Wavefront obj FileFormat\plane.obj"
+let path = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\MeshSamples\humanoid_tri.obj"
+let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\MeshSamples\plane.obj"
 //pyramid.obj" 
 //humanoid_tri.obj" 
 //gourd.obj"/
+
 let mesh1= ReadMeshWavefront(path,difus) |> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))
 let mesh2 = ReadMeshWavefront(path2,whitte)
 //printfn "%+A" mesh1.Vertices
@@ -68,40 +69,7 @@ let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2]}
 let Scene = {Camera=camera ;World = all; Light=[light;light2;light3;light4]} 
 //ball;ball2;ball3;ball4;ball5
 // Scenario2
-(*
-let camera={EyePoint=Point3D(0.0,0.0,-2.5);LookAt=Vector3D(0.0,0.0,2.5); Up=Vector3D(0.0,1.0,0.0)}// ;film=sensor} 
-let light = {origin = Point3D(0.0,10.0,2.0);color=Color(1.0,1.0,0.30); intensity = 1000.0}
-//let light0 = {origin = Point3D(0.2,10.0,2.0);color=Color(1.0,1.0,0.30); intensity = 100.0}
-//let light1 = {origin = Point3D(0.10,10.0,1.90);color=Color(1.0,1.0,0.30); intensity = 100.0}
-//let light2 = {origin = Point3D(10.0,1.0,-2.0);color=Color(1.0,1.0,1.0); intensity = 50.0}
-//let light3 = {origin=Point3D(0.0,0.0,0.0);color=Color(0.850,1.0,0.80); intensity =25.0}
-//
-//
-// scene
-// I define the plane and sphere
 
-let pointWall = Point3D(0.0, 0.0, 10.0)
-let WallVect = UnitVector3D(0.0,0.0,1.0) 
-let Surf = Plane(pointWall, WallVect)
-let Wall = {surf=Surf; Color=0.6}
-let mat1= {DiffuseLight = Color(0.1,0.1,0.1);SpecularLight = Color(0.5,0.5,0.9);shinness= 60; R=0.02; T=0.95; n= 1.35} //Diff Color(0.2,0.5,0.7)
-let ball = {center=Point3D(-2.0,-0.0,3.0); radius=0.50; material=mat1 }
-let mat2 = {DiffuseLight = Color(0.7,0.7,0.01);SpecularLight = Color(0.7,0.7,0.5);shinness= 40; R=0.4; T=0.0; n=2.0}
-let ball2 = {center=Point3D(-2.0,1.0,6.0); radius=1.0; material = mat2}
-let ball3 = {center=Point3D(-2.0,0.5,4.70); radius=0.80; material = mat1}
-let ball4 = {center=Point3D(2.0,1.0,9.0); radius=0.5; material = mat2}
-let ball5 = {center=Point3D(1.50,1.0,3.0); radius=1.0; material = mat2}
-// Do the scene5
-let Scene = {Camera=camera ;Sphere = [ball;ball2;ball3;ball4;ball5]; EndWorld = Wall; Light=[light]} //ball2 ;light0;light1;light2;light3
-//ball;ball2;ball3;ball4;ball5
-*)
-(*
-for i in Scene do
-    if i.GeType()= cam then printfn "Camera"
-    elif i.GeType() = sphere then printfn "Sphere!"
-    elif i.GetType() = wall then printfn "EndWorld"
-    else printfn "ERROR"
-*)
 
 //Viewing Coordinate System w u v
 let w = camera.LookAt.Normalize()
@@ -116,8 +84,6 @@ for i in 0..(PixNumW-1) do
             // create a ray from eye to pixel
             let direct = camera.LookAt+u.ScaleBy(PixWide*float(PixNumW/2-i))+v.ScaleBy(PixHeigh*float(PixNumH/2-j)) // Real to where it points
             let Ray = {uvec=direct.Normalize(); length=infinity; from=camera.EyePoint; travelled=0.0 } //BAD
-            //let Intersec = Surf.IntersectionWith(Ray.ray)
-            //printfn "The intersection is at %f %f" Intersec.X Intersec.Y
             //let intersects = castRay (Scene, Ray)
             let intersects = CastRay_nest (Scene, Ray)
             match intersects with
@@ -136,5 +102,3 @@ form.Controls.Add(img)
 
 img.Image <- bmp
 //bmp.Save(@"C:\Users\JoseM\Desktop\test_all.jpg")
-
-
