@@ -55,6 +55,7 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Compile Include="RayType.fs" />
     <Compile Include="RayCore.fs" />
     <Compile Include="RayColor.fs" />
     <Compile Include="Program.fs" />

@@ -4,7 +4,7 @@ open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 
 open RayCore
-
+open RayType
 
 let colorAt (intersection:Intersection,scn:scene )=
     // Here is the function that defines the shader

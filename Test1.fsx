@@ -2,8 +2,10 @@
 #r @"packages\MathNet.Numerics.Signed.3.7.0\lib\net40\MathNet.Numerics.dll"
 #r @"packages\MathNet.Numerics.FSharp.Signed.3.7.0\lib\net40\MathNet.Numerics.FSharp.dll"
 
+#load "RayType.fs"
 #load "RayCore.fs"
 #load "RayColor.fs"
+
 
 
 open System.Windows.Forms
@@ -11,9 +13,10 @@ open System.Drawing
 open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 
+
+open RayType
 open RayCore
 open RayColor
-
 
 //Definitions of values
 //
