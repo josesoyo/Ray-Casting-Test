@@ -43,8 +43,8 @@ type Color(r: float, g: float, b:float) =
 //
 
 
-type wall = {surf:Plane;Color:float} // style from MartinDot // Endworld
-type material = {DiffuseLight:Color; SpecularLight:Color; shinness:int;R:float; T:float; n:float} //Shinnes: exponent to phong model
+//type wall = {surf:Plane;Color:float} //  Endworld
+type material = {DiffuseLight:Color; SpecularLight:Color; shinness:int;R:float; T:float; n:float; Fresnel:bool} //Shinnes: exponent to phong model
 type light = {origin:Point3D; color:Color; intensity:float}
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
 type sphere = {center:Point3D; radius:float; material:material }

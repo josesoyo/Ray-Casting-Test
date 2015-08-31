@@ -32,8 +32,8 @@ open RayColor
 //Definitions of values
 //
 // Pixels
-let PixNumW = 100
-let PixNumH = 100
+let PixNumW = 200
+let PixNumH = 200
 let PixWide = 2.0/float(PixNumW) //Write something
 let PixHeigh = 2.0/float(PixNumH)
 //
@@ -51,10 +51,10 @@ let light4 = {origin = Point3D(-1.00,2.50,5.0);color=Color(1.0,1.0,1.0); intensi
 //
 // scene
 // Materials
-let refractive= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.95,0.95,0.99);shinness= 60; R=0.01; T=0.99; n= 1.95} 
-let reflective ={DiffuseLight = Color(0.25,0.490,0.25);SpecularLight = Color(0.9,0.9,0.9);shinness= 50; R=0.950; T=0.0; n= 1.45} 
-let difus = {DiffuseLight = Color(0.25,0.90,0.5);SpecularLight = Color(0.5,0.5,0.9);shinness= 80; R=1.0; T=0.0; n= 1.45}
-let whitte ={DiffuseLight = Color(0.9,0.90,0.9);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=0.050; T=0.0; n= 1.45}
+let refractive= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.95,0.95,0.99);shinness= 60; R=0.01; T=0.99; n= 1.95;Fresnel=false} 
+let reflective ={DiffuseLight = Color(0.25,0.490,0.25);SpecularLight = Color(0.9,0.9,0.9);shinness= 50; R=0.950; T=0.0; n= 1.45;Fresnel = true} 
+let difus = {DiffuseLight = Color(0.25,0.90,0.5);SpecularLight = Color(0.5,0.5,0.9);shinness= 80; R=1.0; T=0.0; n= 1.45;Fresnel = true}
+let whitte ={DiffuseLight = Color(0.9,0.90,0.9);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=0.050; T=0.0; n= 1.45;Fresnel = true}
 // I define the spheres and meshes
 
 //Spheres
