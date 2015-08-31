@@ -1,0 +1,12 @@
+
+#Render code written in F#.
+
+It can manage:
+-Works with a Sphere type and meshes .obj type
+-Multiple reflexions and transmissions included
+
+
+Sample image obtained with the Test_AllScene.fsx script:
+!https://pbs.twimg.com/media/CNgJTYeWcAAiLTK.png(Textist)!
+
+The local Paths of the .obj mesh files must be changed on the script and on the program.fs,I don't know (yet) how to specify the local  path.
