@@ -32,47 +32,51 @@ open RayColor
 //Definitions of values
 //
 // Pixels
-let PixNumW = 200
-let PixNumH = 200
+let PixNumW = 100
+let PixNumH = 100
 let PixWide = 2.0/float(PixNumW) //Write something
 let PixHeigh = 2.0/float(PixNumH)
 //
 //Camera: observer and sensor
 //let sensor = Sensor(PixWide, PixHeigh, PixNumW, PixNumH) 
- 
+
 //Scenario1
-let camera={EyePoint=Point3D(-2.5,0.0,0.0);LookAt=Vector3D(2.5,0.0,0.0); Up=Vector3D(0.0,0.0,1.0)}
 
-let light = {origin = Point3D(2.0,0.750,2.50);color=Color(1.0,1.0,1.0); intensity = 30.0}
-let light2 = {origin = Point3D(0.00,-2.0,-1.50);color=Color(1.0,1.0,1.0); intensity = 100.0}
-let light3 = {origin = Point3D(4.50,0.0,1.0);color=Color(1.0,1.0,1.0); intensity = 70.0}
-let light4 = {origin = Point3D(-1.00,2.50,5.0);color=Color(1.0,1.0,1.0); intensity = 90.0}
+let camera={EyePoint=Point3D(-5.25,0.0,-1.0);LookAt=Vector3D(5.5,0.0,0.0); Up=Vector3D(0.0,0.0,1.0)}
 
+let light = {origin = Point3D(-0.0,10.0,-0.50);color=Color(1.0,1.0,1.0); intensity = 1000.0}
+let light2 = {origin = Point3D(-5.00,20.0,1.50);color=Color(1.0,1.0,1.0); intensity = 800.0}
+let light3 = {origin = Point3D(4.0,1.50,1.0);color=Color(1.0,1.0,1.0); intensity = 1000.0}
+let light4 = {origin = Point3D(-5.00,-0.0,2.0);color=Color(1.0,1.0,1.0); intensity = 70.0}
+let lights = [light;light2;light3;light4]
 //
 // scene
 // Materials
-let refractive= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.95,0.95,0.99);shinness= 60; R=0.01; T=0.99; n= 1.95;Fresnel=false} 
-let reflective ={DiffuseLight = Color(0.25,0.490,0.25);SpecularLight = Color(0.9,0.9,0.9);shinness= 50; R=0.950; T=0.0; n= 1.45;Fresnel = true} 
-let difus = {DiffuseLight = Color(0.25,0.90,0.5);SpecularLight = Color(0.5,0.5,0.9);shinness= 80; R=1.0; T=0.0; n= 1.45;Fresnel = true}
-let whitte ={DiffuseLight = Color(0.9,0.90,0.9);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=0.050; T=0.0; n= 1.45;Fresnel = true}
+let refractive= {DiffuseLight = Color(0.001,0.001,0.0075);SpecularLight = Color(0.15,0.15,0.17);shinness= 80; R=0.01; T=0.99; n= 1.25;Fresnel=true} 
+let reflective ={DiffuseLight = Color(0.25,0.490,0.25);SpecularLight = Color(0.5,0.5,0.5);shinness= 50; R=0.0520; T=0.0; n= 1.45;Fresnel = false} 
+let difus = {DiffuseLight = Color(0.75,0.50,0.21);SpecularLight = Color(0.35,0.34,0.5);shinness= 80; R=0.20; T=0.0; n= 1.45;Fresnel = false}
+let whitte ={DiffuseLight = Color(0.7,0.70,0.7);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=0.050; T=0.0; n= 1.45;Fresnel = false}
 // I define the spheres and meshes
 
 //Spheres
-let ball = {center=Point3D(0.70,0.20,0.0); radius=0.250; material=refractive }
-let ball2 = {center=Point3D(10.0,-1.50,1.0); radius=1.965; material=reflective }
+let ball = {center=Point3D(1.0,0.130,-1.0); radius=0.50; material=refractive }
+let ball2 = {center=Point3D(12.0,-1.70,-0.50); radius=1.5; material=reflective }
 //let ball3 = {center = Point3D(3.8125, 0.38, 1.5); radius = 1. ; material= difus}
 // meshes
-let path = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\MeshSamples\humanoid_tri.obj"
+
+
+let path = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\MeshSamples\cube0.obj"
 let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\MeshSamples\plane.obj"
 //pyramid.obj" 
 //humanoid_tri.obj" 
 //gourd.obj"/
-//let path = "MeshSamples/humanoid_tri.obj"
-let mesh1= ReadMeshWavefront(path,difus) |> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))
+//let path = "MeshSamples/humanoid_tri.obj" 
+
+let mesh1= ReadMeshWavefront(path,difus) |> fun x -> Scale x [3.;3.0;3.]|> fun x -> Translate x (Vector3D(4.,1.50,3.5)) 
 let mesh2 = ReadMeshWavefront(path2,whitte)
 //printfn "%+A" mesh1.Vertices
 let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2]}
-let Scene = {Camera=camera ;World = all; Light=[light;light2;light3;light4]} 
+let Scene = {Camera=camera ;World = all; Light=lights} 
 //ball;ball2;ball3;ball4;ball5
 // Scenario2
 
@@ -98,7 +102,7 @@ for i in 0..(PixNumW-1) do
                      //(fun x -> x) |> |> List.head S
                     //printfn "Color is: %+A" color
                     bmp.SetPixel(i,j,Color.FromArgb(int(255.0*color.r),  int(255.0*color.g) , int(255.0*color.b) ))
-
+    if i%20 =0 then printfn "multiplo de 20 %i" i
 (*
 let form = new Form(Text="Rendering test",TopMost=true)
 form.Show()

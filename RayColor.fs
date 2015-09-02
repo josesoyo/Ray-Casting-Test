@@ -104,6 +104,7 @@ let cosinus_in_tr (normal:UnitVector3D, dir:UnitVector3D, nu0) =
 let RFresnel (ci:float, ct:float, nu:float) =
   // ALways taking into account that it's done with material/air interfase 
   // nu = n1/n2 = nTo/nFrom
+  // Hall illumination model[HALL83]
   let term1 = pown ((ci/nu-ct*nu)/(ci/nu+ct*nu)) 2
   let term2 = pown ((ci*nu-ct/nu)/(ci*nu-ct/nu)) 2
   if ct = 0. then  (0.0,0.5*(term1+term2)) 
@@ -115,7 +116,8 @@ let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int) =
     let RayDir = intersection.ray.uvec
     let NormLightDir = RayDir.Negate()//.ScaleBy(-1.0) //Inverse of the ray direction to reflect
     let ReflRayv = intersection.normal.ScaleBy(2.0*intersection.normal.DotProduct(NormLightDir))-NormLightDir //Reflected ray it's unit
-    let ReflRay = {uvec=ReflRayv.Normalize(); length=ReflRayv.Length; from =intersection.point;travelled=intersection.ray.travelled}
+    let ReflRay = {uvec=ReflRayv.Normalize(); length=infinity; from =intersection.point;travelled=intersection.ray.travelled}
+    // Ray.length is created to allow shadows, it's not required more, so it creates a problem if it's not infinity intersecting objects
     let intersects = CastRay_nest (scene, ReflRay)
     match intersects with
         |[] -> Color(0.0,0.0,0.0) // No reflection returns black             
@@ -123,11 +125,13 @@ let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int) =
               let rcolor= colorAt(intersecMin, scene)
               let Depth = dpt + 1
               let LenghtMax = 400.0
-              if intersection.ray.travelled < LenghtMax && Depth < 4 then
+              if intersection.ray.travelled < LenghtMax && Depth < 3 then
                 let (T, R) =
+                    // Whitte ilumination model
                     if intersection.material.Fresnel = false then 
                         (intersection.material.T, intersection.material.R)
                     else
+                        // Hall illumination model[HALL83]
                         let (ci,cr,nu)= cosinus_in_tr (intersection.normal, NormLightDir, intersection.material.n)
                         RFresnel(ci,cr,nu)
                     
@@ -170,7 +174,8 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
     if ang_inc < ang_critic then // TIR
         let cos_trans = sqrt(1.-(inv_n*inv_n )*(1.-cos_inc*cos_inc)) // Cosinus transmited
         let vtrans = RayDir.ScaleBy(inv_n) - intersection.normal.ScaleBy(cos_trans - inv_n*cos_inc)
-        let TransRay = {uvec=vtrans.Normalize();length=vtrans.Length; from =intersection.point;travelled=intersection.ray.travelled}
+        let TransRay = {uvec=vtrans.Normalize();length=infinity; from =intersection.point;travelled=intersection.ray.travelled}
+        // Ray.length is created to allow shadows, it's not required more, so it creates a problem if it's not infinity intersecting objects
         let intersects = CastRay_nest (scene, TransRay)
         match intersects with
             |[] -> Color(0.0,0.0,0.0)
@@ -178,10 +183,12 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
                   let tcolor = colorAt(intersecMin, scene)
                   let Depth = dpt + 1 //Idem as reflected
                   let LenghtMax = 400.0
-                  if intersection.ray.travelled < LenghtMax && Depth < 4 then
+                  if intersection.ray.travelled < LenghtMax && Depth < 3 then
                       let (T, R) = 
+                        // Whitte illumination model
                         if intersection.material.Fresnel = false then (intersection.material.T, intersection.material.R)
                         else 
+                            // Hall illumination model[HALL83]
                             RFresnel(cos_inc,cos_trans,nu)
                                                    
                       if T=0. then tcolor + ReflectedRay(intersecMin,scene,Depth)*R // Don't do trans f not trans next collision
@@ -193,6 +200,13 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
  
 let GlobalIllum (intersection:Intersection, scene:scene) =
     let DirColor = colorAt(intersection, scene) //First  direct color
-    let RefColor = ReflectedRay (intersection,scene,0)*intersection.material.R // Generate ray reflected
-    let TransColor = TransmittedRay (intersection,scene,0)*intersection.material.T //Generate Ray transmited
+    let (T, R) = 
+        //Whitte ilumination model
+        if intersection.material.Fresnel = false then (intersection.material.T, intersection.material.R)
+        else 
+            // Hall illumination model[HALL83]
+           let (ci,cr,nu)= cosinus_in_tr (intersection.normal, intersection.ray.uvec.Negate(), intersection.material.n)
+           RFresnel(ci,cr,nu)
+    let RefColor = ReflectedRay (intersection,scene,0)*R // Generate ray reflected
+    let TransColor = TransmittedRay (intersection,scene,0)*T //Generate Ray transmited
     DirColor+RefColor+ TransColor

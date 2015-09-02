@@ -64,10 +64,12 @@ let intersec_tri (ray:RayFrom,  mesh:mesh,triangle:int list,nrm:UnitVector3D)= /
     if (u>0. && v>0. && (u+v)<1.) then
         let t1 = s2.DotProduct(u0u2) / (s1Dote1)
         if t1 >= ray.length then [] 
-        // The collision cannot be further than the light - shadow
+        // The collision cannot be further than the light when we do a shadow
         // The equal is because in the case s1Dote1 = 0 degenerate and there's no collision (t= infinity)
+        // generates a problem in multiple transmision/reflection if ray.lenght is not inf intersecting not for shadow
+        // Problem solved?
         else
-            // t1 < dist (light- point)
+            // t1 < dist (light- point) case shadow
             let newRay = {uvec=ray.uvec; from = ray.from;length = ray.length; travelled = (t1+ ray.travelled)}
             let VIntersect = u0u1.ScaleBy(u) + u0u2.ScaleBy(v) 
             let PIntersect = Point3D( VIntersect.X + nodes.[n0].X,VIntersect.Y + nodes.[n0].Y,VIntersect.Z + nodes.[n0].Z )
@@ -81,7 +83,7 @@ let castRay_mesh (scene:scene, ray:RayFrom) = //here it's only for sphere
     let interceptions (ray:RayFrom, mesh:mesh)  =
         [0..(List.length(mesh.Triangles)-1)]
         |> List.collect (fun x -> intersec_tri(ray, mesh, mesh.Triangles.[x],mesh.normals.[x]))
-        |> List.filter (fun x -> x.t > 0.051)  //
+        |> List.filter (fun x -> x.t > 0.01)  //
     scene.World.Meshes |> List.collect(fun x -> interceptions(ray,x))
 
 /////

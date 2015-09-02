@@ -4,9 +4,18 @@
 It can manage:
 -Works with a Sphere type and meshes .obj type
 -Multiple reflexions and transmissions included
+-Fresnel reflexion term can be used
 
 
-Sample image obtained with the Test_AllScene.fsx script:
+Image obtained with Test_gourd.fsx:
+!https://pbs.twimg.com/media/CN5hUM7WIAA2IVe.png(Textlist)!
+
+
+More samples images:
+Before fresnel reflection was included: 
 !https://pbs.twimg.com/media/CNgJTYeWcAAiLTK.png(Textist)!
+Similar now:
+!https://pbs.twimg.com/media/CN5hURNXAAA5F7u.png(Textlist)!
+ 
 
 The local Paths of the .obj mesh files must be changed on the script and on the program.fs,I don't know (yet) how to specify the local  path.

@@ -49,7 +49,7 @@ type light = {origin:Point3D; color:Color; intensity:float}
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
 type sphere = {center:Point3D; radius:float; material:material }
 //type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres
-type RayFrom = {uvec:UnitVector3D; length: float; from:Point3D; travelled:float}
+type RayFrom = {uvec:UnitVector3D; length: float; from:Point3D; travelled:float} //length is only for light intersection not infinity
 type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list}
 
 type world = {Meshes: mesh list;Sphere:sphere list}
