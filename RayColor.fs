@@ -106,7 +106,7 @@ let RFresnel (ci:float, ct:float, nu:float) =
   // nu = n1/n2 = nTo/nFrom
   // Hall illumination model[HALL83]
   let term1 = pown ((ci/nu-ct*nu)/(ci/nu+ct*nu)) 2
-  let term2 = pown ((ci*nu-ct/nu)/(ci*nu-ct/nu)) 2
+  let term2 = pown ((ci*nu-ct/nu)/(ci*nu+ct/nu)) 2
   if ct = 0. then  (0.0,0.5*(term1+term2)) 
   else (1.-0.5*(term1+term2),0.5*(term1+term2))
 
