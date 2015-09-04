@@ -1,10 +1,12 @@
 
 #Render code written in F#.
+The point of this branch is to implement different optimization methods in order to reduce the time searching for intersections.
 
 It can manage:
 -Works with a Sphere type and meshes .obj type
 -Multiple reflexions and transmissions included
 -Fresnel reflexion term can be used
+- Bounding Box implemented to reduce computing time
 
 
 Image obtained with Test_gourd.fsx:
