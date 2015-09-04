@@ -56,6 +56,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="RayType.fs" />
+    <Compile Include="BBox.fs" />
     <Compile Include="ObjReader.fs" />
     <Compile Include="RayCore.fs" />
     <Compile Include="RayColor.fs" />
@@ -64,6 +65,10 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Charting">
+      <HintPath>packages\FSharp.Charting.0.90.12\lib\net40\FSharp.Charting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>packages\FSharp.Core.3.1.2.1\lib\net40\FSharp.Core.dll</HintPath>
       <Private>True</Private>

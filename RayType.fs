@@ -50,9 +50,15 @@ type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
 type sphere = {center:Point3D; radius:float; material:material }
 //type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres
 type RayFrom = {uvec:UnitVector3D; length: float; from:Point3D; travelled:float} //length is only for light intersection not infinity
+(* TEst de BBox
 type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list}
 
+*)
+type BBox = {Pmin :float list; Pmax:float list}
+type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list;Bbox:BBox}
+
 type world = {Meshes: mesh list;Sphere:sphere list}
+// In one moment will become subworld
 type scene = {Camera:cam; World:world; Light:light list} //I create a list of Spheres
 
 

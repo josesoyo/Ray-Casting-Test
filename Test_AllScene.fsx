@@ -26,8 +26,8 @@ open RayColor
 //Definitions of values
 //
 // Pixels
-let PixNumW = 200
-let PixNumH = 200
+let PixNumW = 850
+let PixNumH = 850
 let PixWide = 2.0/float(PixNumW) //Write something
 let PixHeigh = 2.0/float(PixNumH)
 //
@@ -35,20 +35,21 @@ let PixHeigh = 2.0/float(PixNumH)
 //let sensor = Sensor(PixWide, PixHeigh, PixNumW, PixNumH) 
  
 //Scenario1
-let camera={EyePoint=Point3D(-5.,0.0,0.0);LookAt=Vector3D(5.,0.0,0.0); Up=Vector3D(0.0,0.0,1.0)}
+let camera={EyePoint=Point3D(-2.5,0.0,0.0);LookAt=Vector3D(2.5,0.0,0.0); Up=Vector3D(0.0,0.0,1.0)}
 
 let light = {origin = Point3D(2.0,0.750,2.50);color=Color(1.0,1.0,1.0); intensity = 50.0}
 let light2 = {origin = Point3D(0.00,-2.0,-1.50);color=Color(1.0,1.0,1.0); intensity = 150.0}
-let light3 = {origin = Point3D(4.50,0.0,1.0);color=Color(1.0,1.0,1.0); intensity = 390.0}
+let light3 = {origin = Point3D(4.50,0.0,1.0);color=Color(1.0,1.0,1.0); intensity = 190.0}
 let light4 = {origin = Point3D(-1.00,2.50,5.0);color=Color(1.0,1.0,1.0); intensity = 99.0}
+let light5= {origin = Point3D(11.7500,0.0,1.0);color=Color(1.0,1.0,1.0); intensity = 200.0}
 
 //
 // scene
 // Materials
 let refractive= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.95,0.95,0.99);shinness= 60; R=0.01; T=0.99; n= 1.95;Fresnel=true} 
-let reflective ={DiffuseLight = Color(0.25,0.490,0.25);SpecularLight = Color(0.9,0.9,0.9);shinness= 50; R=0.950; T=0.0; n= 1.45;Fresnel = false} 
-let difus_human = {DiffuseLight = Color(0.05,0.250,0.1);SpecularLight = Color(0.5,0.5,0.9);shinness= 80; R=1.0; T=0.0; n= 1.45;Fresnel = true}
-let whitte ={DiffuseLight = Color(0.9,0.90,0.9);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=0.050; T=0.0; n= 1.45;Fresnel = false}
+let reflective ={DiffuseLight = Color(0.29,0.590,0.29);SpecularLight = Color(0.9,0.9,0.9);shinness= 50; R=0.250; T=0.0; n= 1.45;Fresnel = false} 
+let difus_human = {DiffuseLight = Color(0.25,0.90,0.5);SpecularLight = Color(0.5,0.5,0.9);shinness= 80; R=0.80; T=0.0; n= 1.45;Fresnel = false}
+let whitte ={DiffuseLight = Color(1.0,1.0,1.0);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=0.050; T=0.0; n= 1.45;Fresnel = false}
 // I define the spheres and meshes
 
 //Spheres
@@ -66,10 +67,9 @@ let mesh1= ReadMeshWavefront(path,difus_human) |> fun x -> Scale x [0.25;0.25;0.
 let mesh2 = ReadMeshWavefront(path2,whitte)
 //printfn "%+A" mesh1.Vertices
 let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2]}
-let Scene = {Camera=camera ;World = all; Light=[light;light2;light3;light4]} 
+let Scene = {Camera=camera ;World = all; Light=[light;light2;light3;light4;light5]} 
 //ball;ball2;ball3;ball4;ball5
 // Scenario2
-
 
 //Viewing Coordinate System w u v
 let w = camera.LookAt.Normalize()
@@ -92,7 +92,7 @@ for i in 0..(PixNumW-1) do
                      //(fun x -> x) |> |> List.head S
                     //printfn "Color is: %+A" color
                     bmp.SetPixel(i,j,Color.FromArgb(int(255.0*color.r),  int(255.0*color.g) , int(255.0*color.b) ))
-
+            if i%10 =0 then printfn "%i lines" i
 
 let form = new Form(Text="Rendering test",TopMost=true)
 form.Show()
@@ -102,4 +102,4 @@ form.Controls.Add(img)
 
 img.Image <- bmp
 printfn "end"
-bmp.Save(@"C:\Users\JoseM\Desktop\test_all_fresnel.jpg")
+//bmp.Save(@"C:\Users\JoseM\Desktop\test_2r.jpg")

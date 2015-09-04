@@ -4,6 +4,7 @@ open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 
 open RayType
+open BBox 
 
 
 ///////////////////////////////////////////////////
@@ -84,7 +85,12 @@ let castRay_mesh (scene:scene, ray:RayFrom) = //here it's only for sphere
         [0..(List.length(mesh.Triangles)-1)]
         |> List.collect (fun x -> intersec_tri(ray, mesh, mesh.Triangles.[x],mesh.normals.[x]))
         |> List.filter (fun x -> x.t > 0.01)  //
-    scene.World.Meshes |> List.collect(fun x -> interceptions(ray,x))
+    // Meshes_intersections = castRay_mesh(scene,ray)
+    let CastBBox(mesh:mesh,ray:RayFrom) =
+        let bolean = BBox_intersec( mesh.Bbox, ray) 
+        if bolean then interceptions(ray,mesh)
+        else []
+    scene.World.Meshes |> List.collect(fun x -> CastBBox(x,ray))
 
 /////
 //
