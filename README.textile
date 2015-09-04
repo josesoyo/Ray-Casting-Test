@@ -8,7 +8,8 @@ It can manage:
 
 
 Image obtained with Test_gourd.fsx:
-!https://pbs.twimg.com/media/CN5hUM7WIAA2IVe.png(Textlist)!
+!https://pbs.twimg.com/media/COC05VwWgAAc6Oi.png(Testlist)!
+https://pbs.twimg.com/media/CN5hUM7WIAA2IVe.png (wrong image)
 
 
 More samples images:
