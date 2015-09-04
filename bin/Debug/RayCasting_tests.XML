@@ -20,6 +20,42 @@
 <member name="">
 
 </member>
+<member name="T:ObjReader">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
 <member name="">
 
 </member>
@@ -77,7 +113,22 @@
 <member name="">
 
 </member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
 <member name="T:RayColor">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
 
 </member>
 <member name="">
@@ -88,10 +139,25 @@
 </member>
 <member name="M:RayCore.pointAtTime(RayType.RayFrom,System.Double)">
 <summary>
- Get the position of a ray at a given time
+ Get the position of a ray at a given time for a Sphere
 </summary>
 </member>
 <member name="T:RayCore">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
 
 </member>
 <member name="">

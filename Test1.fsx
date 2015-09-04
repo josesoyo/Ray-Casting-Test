@@ -94,3 +94,4 @@ img.Image <- bmp
 
 //bmp.Save(@"C:\Users\JoseM\Desktop\test_2r.jpg")
 //printfn "ended!"
+
