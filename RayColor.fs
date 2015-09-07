@@ -6,7 +6,7 @@ open MathNet.Spatial.Euclidean // requieres System.Xml
 open RayCore
 open RayType
 
-let colorAt (intersection:Intersection,scn:scene )=
+(*let colorAt (intersection:Intersection,scn:scene )=
     // Here is the function that defines the shader
     (*
     //As a starting I want to obtain only the dot product
@@ -68,6 +68,82 @@ let colorAt (intersection:Intersection,scn:scene )=
 
 
     AmbLight + List.sumBy(fun x -> DiffSimp x) light + List.sumBy(fun x -> SpecSimp x) light
+*)
+let colorAt (intersection:Intersection,scn:scene )=
+    // Here is the function that defines the shader
+    (*
+    //As a starting I want to obtain only the dot product
+    let FirstShading (sphere:sphere, ray:RayFrom)=
+        let dotproduct= ray.ray.Direction.DotProduct(intersection.normal)
+        let colore = sphere.color*sqrt(dotproduct*dotproduct) //Must be positive
+        colore
+    FirstShading (intersection.sphere, intersection.ray)*)
+    // I want to implement the Phong model:
+    //      I = Ia*Ka*Od+Fatt*Ipoint[Kd*Od(N·L)+Ks*Os(R·V)^n]
+    //                  Ka+Kd+Ks<=1
+    //                  Ka=0.1*(rgb)
+    //                  Kd=sphere.color(rgb)
+    //                  Ks=0.5*(rgb) -> first instance is white
+    //Ambient light
+    let Fatt intersection light=
+        // attenuator for distance
+        let LightDist = (light.origin - intersection.point).Length
+        let distance  = intersection.ray.travelled + LightDist
+        //printfn "the .t is: %f and the ray.travelled: %f" intersection.t intersection.ray.travelled
+        List.min([1.0/(distance*distance); 1.0])
+        //1.0
+    let light = scn.Light
+    let Ia = Color(0.05,0.05,0.05) //Should be defined with the scene
+    let AmbLight = Ia*intersection.material.DiffuseLight //Ia*Ka*Od
+//    let IsShadow intersection light =
+//        let LightDir = light.origin - intersection.point
+//        let RayLight = {uvec=LightDir.Normalize();length=LightDir.Length; from=intersection.point; travelled=intersection.ray.travelled}
+//        let intersects = CastRay_nest (scn, RayLight)
+//        //printfn "there's an intersection at: %f" intersects.Head.ray.travelled
+//        match intersects with
+//            |[] -> true
+//            |_ ->  false
+
+
+    // Diffuse
+    let DiffLight (intersection, light ,fatt:float, normLightDir:UnitVector3D) =
+        let KdOd = intersection.material.DiffuseLight
+        //let LightDir = light.origin - intersection.point
+        //let NormLightDir = LightDir.Normalize() //dir from point to light
+        let Id = light.color* (max (intersection.normal.DotProduct(normLightDir)) 0.0)
+        //let fatt= Fatt intersection light
+        //printfn "Distance travelled is: %f" fatt
+        KdOd*Id*fatt*light.intensity//if IsShadow intersection light then KdOd*Id*fatt*light.intensity //Id*Kd*Od
+        //else Color(0.0,0.0,0.0)
+    //Specular
+    let SpecLight (intersection, light ,fatt:float, normLightDir:UnitVector3D)=
+        let Ks =  intersection.material.SpecularLight //reflectance specular - MODIFY IT in FUTURE
+        //let LightDir = light.origin - intersection.point
+        //let NormLightDir = LightDir.Normalize() //dir from point to light
+        let Rvect = intersection.normal.ScaleBy(2.0*intersection.normal.DotProduct(normLightDir))-normLightDir
+        let DotProds = max (Rvect.DotProduct(intersection.ray.uvec.ScaleBy(-1.0))) 0.0
+        let Is = light.color *pown DotProds intersection.material.shinness
+        //let fatt= Fatt intersection light
+        Ks*Is*fatt*light.intensity//if IsShadow intersection light then Ks*Is*fatt*light.intensity
+        //else Color(0.0,0.0,0.0)
+    // Sum
+    let IsShadow intersection light =
+        // If LightDir.Length = 1 the function will FAIL
+        let LightDir = light.origin - intersection.point
+        let NormLightDir = LightDir.Normalize()
+        let RayLight = {uvec=NormLightDir; from=intersection.point; length=LightDir.Length; travelled=intersection.ray.travelled}
+        let intersects = CastRay_nest (scn, RayLight)
+        //printfn "there's an intersection at: %f" intersects.Head.ray.travelled
+        match intersects with
+            |[] -> let fatt= Fatt intersection light //let unit = paralel intersection
+                   DiffLight (intersection, light, fatt, NormLightDir) + SpecLight (intersection, light, fatt, NormLightDir)
+            |_ ->  Color(0.0,0.0,0.0)
+    //let DiffSimp light = DiffLight intersection light
+    //let SpecSimp light = SpecLight intersection light    
+    let OneShadow light = IsShadow intersection light
+
+
+    AmbLight + List.sumBy(fun x -> OneShadow x) light //+ List.sumBy(fun x -> SpecSimp x) light
 
 //
 //

@@ -67,7 +67,9 @@ let ReadMeshWavefront(path:string,mat:material)=
     let v_list = list_lines |>List.collect(fun x -> VerfromFile x) //|>List.filter(fun x -> x.Length > 0)
     let t_list = list_lines |>List.collect(fun x -> TrifromFile x) |>List.filter(fun x -> x.Length > 0)
     let n_list = MeshNormals( v_list, t_list)
-    let bouncing =BBox_creation (v_list)
+    //
+    let bouncing =BBox_creation (v_list) // should be 0's and do it after transform...
+    //
     //mesh = {Vertices:Point3D list ; Triangles: int list list; material:material}
     {Vertices=v_list;Triangles = t_list;  material=mat ;normals = n_list; Bbox = bouncing}
 
@@ -86,10 +88,10 @@ let Scale mesh scaling =
   let nvert(vert:Point3D list, scaling:float list) =
     vert 
     |> List.collect(fun x -> [Point3D(x.X*scaling.[0],x.Y*scaling.[1],x.Z*scaling.[2])])   
-  let nBBOX (Bbox:BBox, scaling:float list) =
+  let nBBOX (bbox:BBox, scaling:float list) =
     // {Pmin =[pxmin;pymin;pzmin];Pmax=[pxmax;pymax;pzmax]}
-    let nmin = [Bbox.Pmin.[0]*scaling.[0];Bbox.Pmin.[1]*scaling.[1];Bbox.Pmin.[2]*scaling.[2]]
-    let nmax = [Bbox.Pmax.[0]*scaling.[0];Bbox.Pmax.[1]*scaling.[1];Bbox.Pmax.[2]*scaling.[2]]
+    let nmin = [bbox.Pmin.[0]*scaling.[0];bbox.Pmin.[1]*scaling.[1];bbox.Pmin.[2]*scaling.[2]]
+    let nmax = [bbox.Pmax.[0]*scaling.[0];bbox.Pmax.[1]*scaling.[1];bbox.Pmax.[2]*scaling.[2]]
     {Pmin=nmin;Pmax=nmax}
   let nbox = nBBOX(mesh.Bbox, scaling)
   {Vertices = nvert(mesh.Vertices, scaling); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=nbox}
@@ -98,10 +100,10 @@ let Scale mesh scaling =
 let Translate mesh tvec =
   // tvec = translation vector: vector3d
   // mesh
-  let nBBOX (Bbox:BBox, tvec:Vector3D) =
+  let nBBOX (bbox:BBox, tvec:Vector3D) =
     // {Pmin =[pxmin;pymin;pzmin];Pmax=[pxmax;pymax;pzmax]}
-    let nmin = [Bbox.Pmin.[0]+tvec.X;Bbox.Pmin.[1]+tvec.Y;Bbox.Pmin.[2]+tvec.Z]
-    let nmax = [Bbox.Pmax.[0]+tvec.X;Bbox.Pmax.[1]+tvec.Y;Bbox.Pmax.[2]+tvec.Z]
+    let nmin = [bbox.Pmin.[0]+tvec.X;bbox.Pmin.[1]+tvec.Y;bbox.Pmin.[2]+tvec.Z]
+    let nmax = [bbox.Pmax.[0]+tvec.X;bbox.Pmax.[1]+tvec.Y;bbox.Pmax.[2]+tvec.Z]
     {Pmin=nmin;Pmax=nmax}
   let nvert( vert:Point3D list, tvec:Vector3D) =
     vert |> List.collect(fun x -> [x + tvec]) 
