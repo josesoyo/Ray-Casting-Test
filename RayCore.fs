@@ -1,5 +1,6 @@
 ﻿module RayCore
 
+open System
 open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 
@@ -90,7 +91,23 @@ let castRay_mesh (scene:scene, ray:RayFrom) = //here it's only for sphere
         let bolean = BBox_intersec( mesh.Bbox, ray) 
         if bolean then interceptions(ray,mesh)
         else []
-    scene.World.Meshes |> List.collect(fun x -> CastBBox(x,ray))
+    let aCastBBox mesh ray = 
+        let a = CastBBox(mesh,ray)
+        async{return a}                                 // The async type creation
+    //scene.World.Meshes |> List.collect(fun x -> CastBBox(x,ray))
+    let b = scene.World.Meshes 
+            |> List.collect(fun x -> [aCastBBox x ray]) 
+            |>Async.Parallel|> Async.RunSynchronously   //Parallel functions
+            |> Array.toList                             // The RunSynchronously generates an array
+            |> List.collect(fun x -> x)                 // intersection list [] -> intersection list
+
+    //printfn "%i" b.Length
+    //printfn "the b is:\n %+A" b
+    //printfn "ciao"
+    b
+    
+    //scene.World.Meshes |> List.collect(fun x -> CastBBox(x,ray))
+    //scene.World.Meshes |> List.collect(fun x -> CastBBox(x,ray))
 
 /////
 //

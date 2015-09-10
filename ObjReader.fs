@@ -68,10 +68,10 @@ let ReadMeshWavefront(path:string,mat:material)=
     let t_list = list_lines |>List.collect(fun x -> TrifromFile x) |>List.filter(fun x -> x.Length > 0)
     let n_list = MeshNormals( v_list, t_list)
     //
-    let bouncing =BBox_creation (v_list) // should be 0's and do it after transform...
+    //let bouncing =BBox_creation (v_list) // should be 0's and do it after transform...
     //
     //mesh = {Vertices:Point3D list ; Triangles: int list list; material:material}
-    {Vertices=v_list;Triangles = t_list;  material=mat ;normals = n_list; Bbox = bouncing}
+    {Vertices=v_list;Triangles = t_list;  material=mat ;normals = n_list; Bbox = {Pmin=[0.;0.;0.]; Pmax=[0.;0.;0.]}}
 
     
 ///////////////////
@@ -88,24 +88,20 @@ let Scale mesh scaling =
   let nvert(vert:Point3D list, scaling:float list) =
     vert 
     |> List.collect(fun x -> [Point3D(x.X*scaling.[0],x.Y*scaling.[1],x.Z*scaling.[2])])   
-  let nBBOX (bbox:BBox, scaling:float list) =
-    // {Pmin =[pxmin;pymin;pzmin];Pmax=[pxmax;pymax;pzmax]}
-    let nmin = [bbox.Pmin.[0]*scaling.[0];bbox.Pmin.[1]*scaling.[1];bbox.Pmin.[2]*scaling.[2]]
-    let nmax = [bbox.Pmax.[0]*scaling.[0];bbox.Pmax.[1]*scaling.[1];bbox.Pmax.[2]*scaling.[2]]
-    {Pmin=nmin;Pmax=nmax}
-  let nbox = nBBOX(mesh.Bbox, scaling)
-  {Vertices = nvert(mesh.Vertices, scaling); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=nbox}
+  {Vertices = nvert(mesh.Vertices, scaling); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=mesh.Bbox}
 
 // Translate
 let Translate mesh tvec =
   // tvec = translation vector: vector3d
   // mesh
-  let nBBOX (bbox:BBox, tvec:Vector3D) =
-    // {Pmin =[pxmin;pymin;pzmin];Pmax=[pxmax;pymax;pzmax]}
-    let nmin = [bbox.Pmin.[0]+tvec.X;bbox.Pmin.[1]+tvec.Y;bbox.Pmin.[2]+tvec.Z]
-    let nmax = [bbox.Pmax.[0]+tvec.X;bbox.Pmax.[1]+tvec.Y;bbox.Pmax.[2]+tvec.Z]
-    {Pmin=nmin;Pmax=nmax}
   let nvert( vert:Point3D list, tvec:Vector3D) =
-    vert |> List.collect(fun x -> [x + tvec]) 
-  let nbox = nBBOX(mesh.Bbox, tvec)
-  {Vertices = nvert(mesh.Vertices, tvec); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=nbox}
+    vert |> List.collect(fun x -> [x + tvec])
+  {Vertices = nvert(mesh.Vertices, tvec); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=mesh.Bbox}
+
+let Mesh_BBox (mesh:mesh) =
+  //Compute the real BBbox
+  // Must be computed once the object is finally placed
+  let bouncing = BBox_creation (mesh.Vertices) // should be 0's and do it after transform...
+  {Vertices = mesh.Vertices; Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=bouncing}
+
+

@@ -45,7 +45,13 @@ type Color(r: float, g: float, b:float) =
 
 //type wall = {surf:Plane;Color:float} //  Endworld
 type material = {DiffuseLight:Color; SpecularLight:Color; shinness:int;R:float; T:float; n:float; Fresnel:bool} //Shinnes: exponent to phong model
+// Lights:
+//  *SLight Spot light with a direction and cosd to cut at max angle and p to directionality if 0, then tipical
+//  *Alight: Area light
+//  *InfLight: Light from infinity= parallel
 type light = {origin:Point3D; color:Color; intensity:float}
+//type Slight = {origin:Point3D; color:Color; intensity:float; Direction:UnitVector3D; p:int;cosd:float}
+
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
 type sphere = {center:Point3D; radius:float; material:material }
 //type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres
