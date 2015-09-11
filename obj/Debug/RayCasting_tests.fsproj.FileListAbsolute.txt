@@ -12,3 +12,6 @@ C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\b
 C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\bin\Debug\MathNet.Spatial.xml
 C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\obj\Debug\RayCasting_tests.exe
 C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\obj\Debug\RayCasting_tests.pdb
+C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\bin\Debug\FSharp.Charting.dll
+C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\bin\Debug\FSharp.Charting.pdb
+C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\bin\Debug\FSharp.Charting.xml
