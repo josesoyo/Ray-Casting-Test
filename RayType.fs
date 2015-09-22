@@ -42,16 +42,19 @@ type Color(r: float, g: float, b:float) =
     static member Zero = Color(0.0,0.0,0.0)
 //
 
-
+//let a = Matrix3D.RotationTo(UnitVector3D(0.,0.,1.),UnitVector3D(0.5,0.5,0.))
 //type wall = {surf:Plane;Color:float} //  Endworld
 type material = {DiffuseLight:Color; SpecularLight:Color; shinness:int;R:float; T:float; n:float; Fresnel:bool} //Shinnes: exponent to phong model
 // Lights:
-//  *SLight Spot light with a direction and cosd to cut at max angle and p to directionality if 0, then tipical
-//  *Alight: Area light
+//  *PLight Spot light with a direction and cosd to cut at max angle and p to directionality if 0, then tipical
+//  *Clight: Circle light
+//          centre of the cercle, normal, radius, density of intesity: <W/m^2>  or <w>?
+//  *Slight: Square light -> to be done in the future
 //  *InfLight: Light from infinity= parallel
-type light = {origin:Point3D; color:Color; intensity:float}
+type Plight = {origin:Point3D; color:Color; intensity:float} // Direction:UnitVector3D; p:int;cosd:float}
 //type Slight = {origin:Point3D; color:Color; intensity:float; Direction:UnitVector3D; p:int;cosd:float}
-
+type Clight = {Centre:Point3D;Normal:UnitVector3D;Radius:float;Area:float; color:Color; intensityDensity:float; RotationMatrix:Matrix<float>}
+type light = {Point: Plight list; Circle: Clight list}//;Square: Slight list }
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
 type sphere = {center:Point3D; radius:float; material:material }
 //type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres
@@ -65,9 +68,9 @@ type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:materia
 
 type world = {Meshes: mesh list;Sphere:sphere list}
 // In one moment will become subworld
-type scene = {Camera:cam; World:world; Light:light list} //I create a list of Spheres
+type scene = {Camera:cam; World:world; Light:light; Nsamples:int} //I create a list of Spheres - Nsamples for monteCarlo Methods
 
 
 
 //type Intersection = { normal:UnitVector3D; point:Point3D; ray:RayFrom; sphere:sphere;t:float}//; t:float }
-type Intersection = { normal:UnitVector3D; point:Point3D; ray:RayFrom; material:material;t:float}
+type Intersection = { normal:UnitVector3D; point:Point3D; ray:RayFrom; material:material;t:float; Nsamples:int}

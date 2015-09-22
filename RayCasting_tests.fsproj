@@ -58,6 +58,7 @@
     <Compile Include="RayType.fs" />
     <Compile Include="BBox.fs" />
     <Compile Include="ObjReader.fs" />
+    <Compile Include="RandomMethods.fs" />
     <Compile Include="RayCore.fs" />
     <Compile Include="RayColor.fs" />
     <Compile Include="Program.fs" />

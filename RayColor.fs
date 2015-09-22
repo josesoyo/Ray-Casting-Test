@@ -1,10 +1,23 @@
 ﻿module RayColor
+//
+//  Things of this module:
+//  ColorAt -> Shadowing funtion
+//              Includes: -Direct illumination from:
+//                                  *Point lights
+//                                  *Circular lights (sampling them and generating equivalent Plights)
+//                        -Diffuse (N·L) and Specular (L·R)
+//  Global Illumination methods:
+//      The number of iteration/branches defined here ---> Should be modified in the future
+//      Reflection/Transmision 
+//      Transmitted and Reflected via Fresnel coeficient can be computed
+//
 
 open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 
 open RayCore
 open RayType
+open RandomMethods
 
 (*let colorAt (intersection:Intersection,scn:scene )=
     // Here is the function that defines the shader
@@ -92,7 +105,8 @@ let colorAt (intersection:Intersection,scn:scene )=
         //printfn "the .t is: %f and the ray.travelled: %f" intersection.t intersection.ray.travelled
         List.min([1.0/(distance*distance); 1.0])
         //1.0
-    let light = scn.Light
+    let light = scn.Light.Point // Point Light
+    let circleLight = scn.Light.Circle // Circle Light list
     let Ia = Color(0.05,0.05,0.05) //Should be defined with the scene
     let AmbLight = Ia*intersection.material.DiffuseLight //Ia*Ka*Od
 //    let IsShadow intersection light =
@@ -106,7 +120,7 @@ let colorAt (intersection:Intersection,scn:scene )=
 
 
     // Diffuse
-    let DiffLight (intersection, light ,fatt:float, normLightDir:UnitVector3D) =
+    let DiffLight (intersection, light:Plight ,fatt:float, normLightDir:UnitVector3D) =
         let KdOd = intersection.material.DiffuseLight
         //let LightDir = light.origin - intersection.point
         //let NormLightDir = LightDir.Normalize() //dir from point to light
@@ -116,7 +130,7 @@ let colorAt (intersection:Intersection,scn:scene )=
         KdOd*Id*fatt*light.intensity//if IsShadow intersection light then KdOd*Id*fatt*light.intensity //Id*Kd*Od
         //else Color(0.0,0.0,0.0)
     //Specular
-    let SpecLight (intersection, light ,fatt:float, normLightDir:UnitVector3D)=
+    let SpecLight (intersection, light:Plight ,fatt:float, normLightDir:UnitVector3D)=
         let Ks =  intersection.material.SpecularLight //reflectance specular - MODIFY IT in FUTURE
         //let LightDir = light.origin - intersection.point
         //let NormLightDir = LightDir.Normalize() //dir from point to light
@@ -142,8 +156,22 @@ let colorAt (intersection:Intersection,scn:scene )=
     //let SpecSimp light = SpecLight intersection light    
     let OneShadow light = IsShadow intersection light
 
+    let ExtendedLight (intersection, clight:Clight) =
+        // Only Circle light
+        // when other shpahes do a match to select the sphape
+        //
+        // Computes the color with one random point of the surface -> CircleLight -> PointLight
+        // and considers the fraction of the intensity
+        let (RandR,RandPhi) = SampDisk clight.Radius
+        let (x,y) = (RandR*cos(RandPhi),RandR*sin(RandPhi))
+        let Rpoint = Point3D(x,y,0.0)
+        let shape = Rpoint.TransformBy(m=clight.RotationMatrix) // I must rorate the normal vector (0.,0.,1.) -> (xn,yn,zn)
+        let lightPoint = Point3D(shape.X+clight.Centre.X,shape.Y+clight.Centre.Y,shape.Z+clight.Centre.Z)
+        let tempLight = {origin = lightPoint;color = clight.color; intensity =(clight.intensityDensity  *(clight.Area/float(intersection.Nsamples)))} // {origin:Point3D; color:Color; intensity:float} 
+        OneShadow tempLight
 
-    AmbLight + List.sumBy(fun x -> OneShadow x) light //+ List.sumBy(fun x -> SpecSimp x) light
+    let ExtendedShadow cLight= [1..intersection.Nsamples] |> List.sumBy(fun x -> (ExtendedLight (intersection, cLight)))
+    AmbLight + List.sumBy(fun x -> OneShadow x) light + List.sumBy(fun x -> ExtendedShadow x) circleLight//+ List.sumBy(fun x -> SpecSimp x) light
 
 //
 //
@@ -187,6 +215,7 @@ let RFresnel (ci:float, ct:float, nu:float) =
   else (1.-0.5*(term1+term2),0.5*(term1+term2))
 
 //
+//  GLOBAL ILLUMINATION
 //
 let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int) =
     let RayDir = intersection.ray.uvec
@@ -201,7 +230,7 @@ let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int) =
               let rcolor= colorAt(intersecMin, scene)
               let Depth = dpt + 1
               let LenghtMax = 400.0
-              if intersection.ray.travelled < LenghtMax && Depth < 3 then
+              if intersection.ray.travelled < LenghtMax && Depth < 2 then
                 let (T, R) =
                     // Whitte ilumination model
                     if intersection.material.Fresnel = false then 
@@ -236,7 +265,7 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
     else
         printfn "ciao"   *)    
     let (cos_inc,nu) = SideRay(ci, n)
-    let inv_n = 1./nu // It is used the inverse
+    let inv_n = 1./nu // It is used the inverse = (n_from/n_to)
     let AngCritic n_transm =
         // Obtain Critical angle for TIR
         if n_transm > 1. then
@@ -244,7 +273,7 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
         else
             let tir = asin(n_transm) // Pi/2  
             tir
-    let ang_critic = AngCritic n
+    let ang_critic = AngCritic nu
     let ang_inc = acos(cos_inc)
 
     if ang_inc < ang_critic then // TIR
@@ -259,7 +288,7 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int) =
                   let tcolor = colorAt(intersecMin, scene)
                   let Depth = dpt + 1 //Idem as reflected
                   let LenghtMax = 400.0
-                  if intersection.ray.travelled < LenghtMax && Depth < 3 then
+                  if intersection.ray.travelled < LenghtMax && Depth < 2 then
                       let (T, R) = 
                         // Whitte illumination model
                         if intersection.material.Fresnel = false then (intersection.material.T, intersection.material.R)
