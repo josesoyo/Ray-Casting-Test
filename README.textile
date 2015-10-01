@@ -3,15 +3,18 @@
 The point of this branch is to implement different optimization methods in order to reduce the time searching for intersections.
 
 It can manage:
--Extended lights added as a circular light.
--Works with a Sphere type and meshes .obj type
--Multiple reflexions and transmissions included
--Fresnel reflexion term can be used
+- Extended lights added as a circular light - directionality added.
+- Works with a Sphere type and meshes .obj type
+- Multiple reflexions and transmissions included
+- Fresnel reflexion term can be used
 - Bounding Box implemented to reduce computing time
+- Space partitioning implement, currently can be optimized much more the code. 
 - Parallel implementation throught async F# on BBox and on pixel initialization. Up to now on the initialization only creates 4 procces and cannot be modified. Great Speed-up obtained.
 
 Previous example with an extended light illuminating the scene:
-!https://pbs.twimg.com/media/CPgkkPCXAAARioP.png(Testlist)!
+!https://pbs.twimg.com/media/CQPlowJWEAMID99.png(Testlist)!
+Script: Test_PreProcessorGrid.fsx - Just comment that this example is not really faster with the space partitioning due to the bounding of the world
+https://pbs.twimg.com/media/CPgkkPCXAAARioP.png
 Script: Test_AllScene_ExtendedSource.fsx
 --------------------------------------------------------------
 Old

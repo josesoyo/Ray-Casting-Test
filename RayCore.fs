@@ -40,12 +40,13 @@ let castRay (scene:scene, ray:RayFrom) =
     scene.World.Sphere 
     |> List.collect (fun x -> intersection(ray, x,scene.Nsamples))  // Find interstion with all the spheres
     |> List.filter (fun x -> x.t > 0.01)             // Select the ones that are not negative-€[e,infinity)
+    |> List.filter(fun x -> x.t < x.ray.length)     // If is further no intersection with light, the ray.length means the distance to a light in RayColor.fs
 
 //////////////////////////
 //
 // Intersection for Meshes
 // Not implemented yet, but intersection can handle triangles and squares as a primitives now
-//
+// Square used on Sensor for fowrard ray tracing
 //////////////////////////
 
 let intersec_mesh (ray:RayFrom,  mesh:mesh,triangle:int list,nrm:UnitVector3D, nsamples:int, shape:char)= // normal is only passing
@@ -68,7 +69,7 @@ let intersec_mesh (ray:RayFrom,  mesh:mesh,triangle:int list,nrm:UnitVector3D, n
         if shape = 't' then // intersection with a triangle condition
             if (u>0. && v>0. && (u+v)<1.) then true
             else false
-        elif shape = 's' then // intersection with a square condition
+        elif shape = 's' then // intersection with a square condition - PArallelograms (Not trapezoids)
             if (u>0. && v>0. && u<1. && v < 1.) then true
             else false
         else 
@@ -94,7 +95,7 @@ let intersec_mesh (ray:RayFrom,  mesh:mesh,triangle:int list,nrm:UnitVector3D, n
 // Prepared to accept triangles and squares as a primitive for intersection. 
 //Squares should reduce the computation time
 let intersec_tri (ray, mesh,triangle,nrm,nsamples)= intersec_mesh (ray, mesh,triangle,nrm,nsamples,'t')
-let intersec_square (ray, mesh,triangle,nrm,nsamples)= intersec_mesh (ray, mesh,triangle,nrm,nsamples,'s')
+let intersec_square (ray, mesh,triangle,nrm,nsamples)= intersec_mesh (ray, mesh,triangle,nrm,nsamples,'s') // Parallelograms
 //
 
 
@@ -109,10 +110,9 @@ let castRay_mesh (scene:scene, ray:RayFrom) = //here it's only for sphere
         if bolean then interceptions(ray,mesh,scene.Nsamples)
         else []
     (*
-    let aCastBBox mesh ray = 
+    let aCastBBox mesh ray =  // Parallel algorithm
         let a = CastBBox(mesh,ray)
         async{return a}                                 // The async type creation
-    //scene.World.Meshes |> List.collect(fun x -> CastBBox(x,ray))
     let b = scene.World.Meshes 
             |> List.collect(fun x -> [aCastBBox x ray]) 
             |>Async.Parallel|> Async.RunSynchronously   //Parallel functions

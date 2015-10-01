@@ -19,7 +19,24 @@ type Sensor (psw:float, psh:float, pw:int, ph:int) =
     let Ypos = DenseMatrix.init pw ph (fun i j -> (psw*float(ph/2-j)))
     member this.value = SeArray
     member this.X = Xpos
-    member this.Y = Ypos *)
+    member this.Y = Ypos 
+*)
+type Sensor = {//This should be the type
+               Centre:Point3D;
+               Normal:UnitVector3D; // Direction of the sensor = Dir of camera
+               xpix :int; ypix: int // (1,0,0) y (0,1,0) -> Rotated
+               pixsize:float // Suposed rectangular
+               //Up not required since it's up +Y in local coordinates - CAREFULL
+               RotationMatrix:Matrix<float> // From local coordinates to global coordinates
+               
+               //Real sensor properties
+               PhotosSature: int // Number of photons that saturate the image
+               Rcolor:Matrix<int> // Saves number of photons received
+               Gcolor:Matrix<int>
+               Bcolor:Matrix<int>
+               }
+
+
 //Color type from martindoms (CopyPaste)
 type Color(r: float, g: float, b:float) =
     member this.r = r
@@ -55,10 +72,13 @@ type Plight = {origin:Point3D; color:Color; intensity:float} // Direction:UnitVe
 //type Slight = {origin:Point3D; color:Color; intensity:float; Direction:UnitVector3D; p:int;cosd:float}
 type Clight = {Centre:Point3D;Normal:UnitVector3D;Radius:float;Area:float; color:Color; intensityDensity:float; RotationMatrix:Matrix<float>}
 type light = {Point: Plight list; Circle: Clight list}//;Square: Slight list }
+
+
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
 type sphere = {center:Point3D; radius:float; material:material }
 //type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres
 type RayFrom = {uvec:UnitVector3D; length: float; from:Point3D; travelled:float} //length is only for light intersection not infinity
+type RayForward = {uvec:UnitVector3D; mlength: float; from:Point3D; travelled:float; color:Color; intensity:float}
 (* TEst de BBox
 type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list}
 
@@ -67,7 +87,15 @@ type BBox = {Pmin :float list; Pmax:float list}
 type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list;Bbox:BBox}
 
 type world = {Meshes: mesh list;Sphere:sphere list}
+
+
 // In one moment will become subworld
+
+type Grid3D= {Bbox:BBox                                                            //BBox of the 3DGrid
+              MeshID:int list; MeshTriangles: int list list list;MBBox:BBox list;  //mesh list
+              SphID:int list; SphBox:BBox list;                                    //spheres list
+              }
+
 type scene = {Camera:cam; World:world; Light:light; Nsamples:int} //I create a list of Spheres - Nsamples for monteCarlo Methods
 
 

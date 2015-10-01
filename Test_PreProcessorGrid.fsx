@@ -7,10 +7,13 @@
 #load "RayType.fs"
 #load "BBox.fs"
 #load "RayCore.fs"
+#load "RayCoreGrid.fs"
 #load "RandomMethods.fs"
-#load "RayColor.fs"
+#load "RayColorGrid.fs"
 #load "ObjReader.fs"
 
+#load "PreprocesorGrid.fs"
+#load "RayCoreGrid.fs"
 
 open System.IO
 open System.Windows.Forms
@@ -21,7 +24,9 @@ open MathNet.Spatial.Euclidean // requieres System.Xml
 open ObjReader
 open RayType
 open RayCore
-open RayColor
+open RayColorGrid
+open PreprocesorGrid
+open RayCoreGrid
 
 let PI = 3.141592653589
 
@@ -75,12 +80,14 @@ let mesh1= ReadMeshWavefront(path,difus_human) |> fun x -> Scale x [0.25;0.25;0.
 let mesh2 = ReadMeshWavefront(path2,whitte) |> Mesh_BBox 
 //printfn "%+A" mesh1.Vertices
 let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2]}
+//let all = {Meshes = [];Sphere = [ball2]}
 let lights ={Point= [];Circle = [clight]} //light;light2;light3;light4;light5
+let partition = Partitionate (all, 2)
+//partition.
 
 let Scene = {Camera=camera ;World = all; Light=lights; Nsamples=25} 
 //ball;ball2;ball3;ball4;ball5
 // Scenario2
-
 //Viewing Coordinate System w u v
 let w = camera.LookAt.Normalize()
 let u = camera.Up.CrossProduct(w).Normalize()
@@ -106,12 +113,12 @@ let casting (pixH:int list) =
                 let direct = camera.LookAt+u.ScaleBy(PixWide*float(PixNumW/2-i))+v.ScaleBy(PixHeigh*float(PixNumH/2-j)) // Real to where it points
                 let Ray = {uvec= direct.Normalize(); length=infinity; from=camera.EyePoint; travelled=0.0 } //BAD UnitVector3D(0.0,0.0,-1.)  
                 //let intersects = castRay (Scene, Ray)
-                let intersects = CastRay_nest (Scene, Ray)
+                let intersects = Cast_3DGrid (Scene,Ray,partition)//CastRay_nest (Scene, Ray)
                 match intersects with
                 | [] -> rimage.[i,j] <- 0.0
                         gimage.[i,j] <- 0.0
                         bimage.[i,j] <- 0.0 //bmp.SetPixel(i,j,Color.Gray)
-                | _ ->  let color = GlobalIllum(intersects |>List.minBy(fun x -> x.t), Scene  )//colorAt (intersects |>List.minBy(fun x -> x.t), Scene  )
+                | _ ->  let color = GlobalIllum(intersects |>List.minBy(fun x -> x.t), Scene ,partition )//colorAt (intersects |>List.minBy(fun x -> x.t), Scene  )
                             //(fun x -> x) |> |> List.head S
                         //printfn "Color is: %+A" color
                         rimage.[i,j] <- color.b
@@ -136,7 +143,7 @@ for i in 0..(PixNumW-1) do
 
 #time    
 
-bmp.Save(@"C:\Users\JoseM\Desktop\test_AllScene_parallel.jpg")
+bmp.Save(@"C:\Users\JoseM\Desktop\test_AllScene_gridDirLight.jpg")
 let form = new Form(Text="Rendering test",TopMost=true)
 form.Show()
 

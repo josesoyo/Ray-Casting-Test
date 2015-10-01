@@ -60,10 +60,13 @@
     <Compile Include="ObjReader.fs" />
     <Compile Include="RandomMethods.fs" />
     <Compile Include="RayCore.fs" />
+    <Compile Include="RayCoreGrid.fs" />
     <Compile Include="RayColor.fs" />
+    <Compile Include="RayColorGrid.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <Compile Include="PreprocesorGrid.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Charting">

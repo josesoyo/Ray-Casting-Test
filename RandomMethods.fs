@@ -31,7 +31,7 @@ let SampUnitHemisphereToCart (dummy:int) =
     let x = (sin phi )*stheta 
     let y = (cos phi) *stheta 
     let z = ctheta
-    let modul = (x*x)+(y*y)+(z*z)
+    //let modul = (x*x)+(y*y)+(z*z)
     (x,y,z)
 
 let SampDisk (radius:float) =
@@ -39,6 +39,15 @@ let SampDisk (radius:float) =
     let r = radius* sqrt (samples.[0])
     let theta = 2.*PI*samples.[1]
     (r,theta)
+
+let SampUnitHemiCosToCart (dummy:int) =
+    // Hemisphere cosine weighted
+    let (r,theta) = SampDisk (1.)
+    let (x,y) = (r*cos theta , r*sin theta)
+    let z = sqrt(max 0.0 (1.-x*x-y*y))
+    //let modul = x*x+y*y+z*z
+    (x,y,z)//,modul)
+
 
 let SampUnitDisk (dummy:int) =
     // unit dist
