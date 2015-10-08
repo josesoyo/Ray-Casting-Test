@@ -66,7 +66,8 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
         // Check if one vertex is inside the BBox - Not enough to say if 1Triangle is inside
         //               CAREFULL!!!
         //               One side should be < and the other >=, but I create a problem on the edges...
-        if vertex.X <= box.Pmax.[0] && vertex.Y <= box.Pmax.[1] && vertex.Z <= box.Pmax.[2] then 
+        //              To solve: if npart=nmax then pmax=pmax+0.01
+        if vertex.X < box.Pmax.[0] && vertex.Y < box.Pmax.[1] && vertex.Z < box.Pmax.[2] then 
             if vertex.X >= box.Pmin.[0] && vertex.Y >= box.Pmin.[1] && vertex.Z >= box.Pmin.[2] then true
             else false     
         else false
@@ -132,15 +133,37 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
             else 
                 let intersecTRI = edgeRays 
                                     |> List.collect(fun x -> intersec_tri(x, mesh, tri,mesh.normals.[i],0))
-                                    |> List.filter (fun x -> x.t > 0.01)
+                                    |> List.filter (fun x -> x.t > 0.0001)
                 match intersecTRI with
                 | [] -> false //No intersection
                 | _ -> true
-        
+        //let aaaa = (false, 3.0)
+        //fst/snd aaaa
         let triangles = mesh.Triangles
         let BoolT = [0..(triangles.Length-1)] 
                     |> List.collect(fun x -> [realboolean( mesh.Triangles.[x], boolv, mesh, x,edgeRays)]) //triangles insi
         BoolT
+    let pOnBoundaries (boolv:bool list,mesh:mesh, edgeRays:RayFrom list)= 
+        // Find the points that are in one boundary ob the bbox
+        // boolv = boolans of the vertices
+        // edgeRays = Vectors of the edges of the partition
+        //
+        // Then check the intersections of the edges ob the partition box
+        let realOnLimit (tri:int list, boolv:bool list,mesh:mesh, i:int,edgeRays:RayFrom list)= //boolean of intersection of triangle with box
+            //printfn "Triangles lenght: %+A" tri.Length
+            //printfn "%+A" tri
+            //printfn "Boollength: %+A %+A" boolv.Length mesh.Triangles.Length
+            if boolv.[tri.[0]-1] && boolv.[tri.[1]-1] && boolv.[tri.[2]-1] then [] // || = or && and
+            else 
+                let intersecTRI = edgeRays 
+                                  |> List.collect(fun x -> intersec_tri(x, mesh, tri,mesh.normals.[i],0))
+                                  |> List.filter (fun x -> x.t > 0.0001)
+                                  |> List.collect(fun x -> [x.point])
+                intersecTRI
+        let triangles = mesh.Triangles
+        let PBoundaries = [0..(triangles.Length-1)] 
+                          |> List.collect(fun x -> realOnLimit( mesh.Triangles.[x], boolv, mesh, x,edgeRays)) //triangles insi
+        PBoundaries
 
     let SubMeshT (mesh:mesh,boolv: bool list,edgeRays:RayFrom list) =    
         // List of triangles intersected
@@ -154,21 +177,43 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
         |> List.collect(fun x -> [triangles.[x]])
       
       
-    let SubMeshBox (mesh:mesh,boolv:bool list) = // NOT USED
+    let SubMeshBox (mesh:mesh,boolv:bool list,edgeRays:RayFrom list) =
         //Find the bounding box of a submesh inside a partition
-        let vertexs = mesh.Vertices
+        let vertexs = mesh.Vertices                                     //Points inside
+        let onLimits = pOnBoundaries (boolv,mesh, edgeRays)             //Points on the boundaryes
         //Bounding box of the submesh 
         //Wrong I must use BoxofIntersection (meshBox:BBox, partitionBox:BBox) in BBox.fs --> NONONONO and NO 
         // In any case shall be done with the triangles obtained in SubMeshT
         let select = 
             [0..(boolv.Length-1)]
             |> List.collect(fun x -> IDList(x,boolv.[x]))
-        let listx = select |> List.collect(fun x -> [vertexs.[x].X]) 
-        let listy = select  |> List.collect(fun x -> [vertexs.[x].Y]) 
-        let listz = select  |> List.collect(fun x -> [vertexs.[x].Z]) 
-        //printfn "SubmeshBox:\n %+A \n %+A \n "select boolv
-        {Pmin=[List.min(listx); List.min(listy); List.min( listz)];
-         Pmax=[List.max (listx); List.max (listy); List.max (listz)]}
+        //Points on the boundaries
+
+        match (select,onLimits) with
+        |([],[]) -> //  ERROR - emty empty
+                    {Pmin=[];
+                     Pmax=[]}
+        |([],_) ->  let listxl = onLimits |> List.collect(fun x -> [x.X])  
+                    let listyl = onLimits  |> List.collect(fun x -> [x.Y])  
+                    let listzl = onLimits  |> List.collect(fun x -> [x.Z]) 
+                    {Pmin=[List.min(listxl); List.min(listyl); List.min(listzl)];
+                     Pmax=[List.max(listxl); List.max(listyl); List.max(listzl)]}
+        | (_,[]) -> // No intersection on the limits
+                    let listx = select |> List.collect(fun x -> [vertexs.[x].X]) 
+                    let listy = select  |> List.collect(fun x -> [vertexs.[x].Y])
+                    let listz = select  |> List.collect(fun x -> [vertexs.[x].Z])
+                    {Pmin=[List.min(listx); List.min(listy); List.min(listz)];
+                     Pmax=[List.max(listx); List.max(listy); List.max(listz)]}
+        | (_,_) -> // Both exits
+                    let listxl = onLimits |> List.collect(fun x -> [x.X]) 
+                    let listyl = onLimits  |> List.collect(fun x -> [x.Y]) 
+                    let listzl = onLimits  |> List.collect(fun x -> [x.Z])
+                    let listx = select |> List.collect(fun x -> [vertexs.[x].X]) 
+                    let listy = select  |> List.collect(fun x -> [vertexs.[x].Y]) 
+                    let listz = select  |> List.collect(fun x -> [vertexs.[x].Z]) 
+
+                    {Pmin=[List.min([List.min(listx);List.min(listxl)]); List.min([List.min(listy);List.min(listyl)]); List.min( [List.min(listz);List.min(listzl)])];
+                     Pmax=[List.max([List.max(listx);List.max(listxl)]); List.max([List.max(listy);List.max(listyl)]); List.max( [List.max(listz);List.max(listzl)])]}
           
 
     let AllMeshesIter (gbox:BBox, meshes:mesh list) =
@@ -227,15 +272,18 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
             |> List.collect(fun x -> [SubMeshT x])
         *)
         printfn "MEsh %+A \n %+A" FirstMeshListID boolVinMeshes
-        let MeshsubBoxes = 
+        let MeshsubBoxes = //SubMeshBox (mesh,boolv list,edgeRays)
+        
             // Not the best, should be computed as the BBox of the triangles inside the partition
             // The current box may be much bigger than the required (CAn be seen on the paper)
-            MeshListID//[0..(MeshListID.Length-1)]
+            [0..(MeshListID.Length-1)] //MeshListID//
+            |>List.collect(fun x -> [SubMeshBox(meshes.[MeshListID.[x]],boolVinMeshes.[x],rayEdges)])
+            (*  DISCOMMENT TO USE OLD
             //|>List.collect(fun x ->[( meshes.[MeshListID.[x]],boolv.[x])])
             |>List.collect(fun x ->[( meshes.[x].Bbox,gbox)])
             |> List.collect(fun x -> [BoxofIntersection x]) 
             //|>List.collect(fun x -> [SubMeshBox x]) // BoxofIntersection (meshBox:BBox, partitionBox:BBox)
-        
+            *)
         (MeshListID, MeshTriangles, MeshsubBoxes)
         
     AllMeshesIter (box, meshes)
@@ -267,13 +315,23 @@ let Partitionate (world:world,part:int)=
         let mutable boxes = [] // Each element on the list is a partition of the world
         for i in [1..partx] do                              // From Pmin to Pmax
             let pxmin = stepx*float(i-1)+limits.Pmin.[0]
-            let pxmax = stepx * float(i)+limits.Pmin.[0]
+            //let pxmax = stepx * float(i)+limits.Pmin.[0]
+            let pxmax=
+                if i = partx then // Case limit if the world
+                     stepx * float(i)+limits.Pmin.[0] + 0.01                        // world limit
+                else stepx * float(i)+limits.Pmin.[0]
+
             for j in [1..party] do                          // From Pmin to Pmax
                 let pymin = stepy*float(j-1)+limits.Pmin.[1]
-                let pymax = stepy * float(j)+limits.Pmin.[1]
+                let pymax = 
+                    if j = party then stepy * float(j)+limits.Pmin.[1] + 0.01       // world limit
+                    else stepy * float(j)+limits.Pmin.[1]
+
                 for k in [1..partz] do                      // From Pmin to Pmax
                     let pzmin = stepz*float(k-1)+limits.Pmin.[2]
-                    let pzmax = stepz * float(k)+limits.Pmin.[2]
+                    let pzmax = 
+                        if k = partz then stepz * float(k)+limits.Pmin.[2] + 0.01   // world limit
+                        else stepz * float(k)+limits.Pmin.[2]
                     let thisbox = {Pmin = [pxmin;pymin;pzmin] ;
                                    Pmax = [pxmax;pymax;pzmax] }
                     let (sphIDs,sphbox) = SphereToGrid (thisbox, world.Sphere)

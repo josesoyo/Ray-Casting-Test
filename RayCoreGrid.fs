@@ -57,4 +57,6 @@ let Cast_3DGrid (scene,ray,grid:Grid3D list) =
                       |> List.collect(fun x ->[listGrid.[x]])              //Partitions that intersect
 
     // Do the intersections with the spheres and meshes
+    //printfn "%+A" IntListGrid
     IntListGrid |> List.collect(fun x -> InsidePartition (x, scene, ray))
+

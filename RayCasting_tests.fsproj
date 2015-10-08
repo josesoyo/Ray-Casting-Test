@@ -67,6 +67,7 @@
     <None Include="App.config" />
     <Content Include="packages.config" />
     <Compile Include="PreprocesorGrid.fs" />
+    <Compile Include="Sensor.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Charting">

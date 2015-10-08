@@ -51,7 +51,7 @@ let castRay (scene:scene, ray:RayFrom) =
 
 let intersec_mesh (ray:RayFrom,  mesh:mesh,triangle:int list,nrm:UnitVector3D, nsamples:int, shape:char)= // normal is only passing
     // Method 2 from PBRT book eq 3.5
-    let nodes = mesh.Vertices // *** Is wasting memory *** I can: mesh.Vertices.[n0]
+    let nodes = mesh.Vertices // *** Is wasting memory --> It copyes the direction, no waste memory *** I can: mesh.Vertices.[n0]
 
     let (n0,n1,n2) = (triangle.[0]-1, triangle.[1]-1, triangle.[2]-1)
     let (u0u1,u0u2) = (nodes.[n1]-nodes.[n0],nodes.[n2]-nodes.[n0]) 

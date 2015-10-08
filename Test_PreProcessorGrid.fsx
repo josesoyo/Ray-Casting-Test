@@ -1,4 +1,6 @@
-﻿// Test in which there are spheres and meshes
+﻿//  Test in which there are spheres and meshes
+//  Same scene as Test_AllScene_ExtendedSource.fsx
+//  But it includes the space partition
 
 #r @"packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll"
 #r @"packages\MathNet.Numerics.Signed.3.7.0\lib\net40\MathNet.Numerics.dll"
@@ -34,8 +36,8 @@ let PI = 3.141592653589
 //Definitions of values
 //
 // Pixels
-let PixNumW = 200
-let PixNumH = 200
+let PixNumW = 100
+let PixNumH = 100
 let PixWide = 2.0/float(PixNumW) //Write something
 let PixHeigh = 2.0/float(PixNumH)
 //
@@ -79,7 +81,7 @@ let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-
 let mesh1= ReadMeshWavefront(path,difus_human) |> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))|> Mesh_BBox 
 let mesh2 = ReadMeshWavefront(path2,whitte) |> Mesh_BBox 
 //printfn "%+A" mesh1.Vertices
-let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2]}
+let all = {Meshes = [mesh2;mesh1];Sphere = [ball;ball2]}
 //let all = {Meshes = [];Sphere = [ball2]}
 let lights ={Point= [];Circle = [clight]} //light;light2;light3;light4;light5
 let partition = Partitionate (all, 2)
