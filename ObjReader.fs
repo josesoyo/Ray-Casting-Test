@@ -11,7 +11,7 @@ open System.IO
 open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
 open RayType
-
+open BBox 
 //
 // Functions to read the Wavefront file
 //
@@ -60,15 +60,20 @@ let MeshNormals(nodes:Point3D list, triangle:int list list) =
         normals <- normals@[(u0u1.CrossProduct(u0u2)).Normalize()]       
     normals.Tail
 
+
 let ReadMeshWavefront(path:string,mat:material)=
     let lines = File.ReadLines(path)    
     let list_lines = Seq.toList(lines)
     let v_list = list_lines |>List.collect(fun x -> VerfromFile x) //|>List.filter(fun x -> x.Length > 0)
     let t_list = list_lines |>List.collect(fun x -> TrifromFile x) |>List.filter(fun x -> x.Length > 0)
     let n_list = MeshNormals( v_list, t_list)
+    //
+    //let bouncing =BBox_creation (v_list) // should be 0's and do it after transform...
+    //
     //mesh = {Vertices:Point3D list ; Triangles: int list list; material:material}
-    {Vertices=v_list;Triangles = t_list;  material=mat ;normals = n_list}
+    {Vertices=v_list;Triangles = t_list;  material=mat ;normals = n_list; Bbox = {Pmin=[0.;0.;0.]; Pmax=[0.;0.;0.]}}
 
+    
 ///////////////////
 //
 // Transformations
@@ -83,12 +88,20 @@ let Scale mesh scaling =
   let nvert(vert:Point3D list, scaling:float list) =
     vert 
     |> List.collect(fun x -> [Point3D(x.X*scaling.[0],x.Y*scaling.[1],x.Z*scaling.[2])])   
-  {Vertices = nvert(mesh.Vertices, scaling); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals}
+  {Vertices = nvert(mesh.Vertices, scaling); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=mesh.Bbox}
 
 // Translate
 let Translate mesh tvec =
   // tvec = translation vector: vector3d
   // mesh
   let nvert( vert:Point3D list, tvec:Vector3D) =
-    vert |> List.collect(fun x -> [x + tvec]) 
-  {Vertices = nvert(mesh.Vertices, tvec); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals}
+    vert |> List.collect(fun x -> [x + tvec])
+  {Vertices = nvert(mesh.Vertices, tvec); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=mesh.Bbox}
+
+let Mesh_BBox (mesh:mesh) =
+  //Compute the real BBbox
+  // Must be computed once the object is finally placed
+  let bouncing = BBox_creation (mesh.Vertices) // should be 0's and do it after transform...
+  {Vertices = mesh.Vertices; Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=bouncing}
+
+
