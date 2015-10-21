@@ -68,6 +68,8 @@
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <None Include="Test_AllScene_ExtendedSource.fsx" />
+    <None Include="Test_PreProcessorGrid.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
@@ -80,10 +82,6 @@
     </Reference>
     <Reference Include="MathNet.Numerics.FSharp">
       <HintPath>..\packages\MathNet.Numerics.FSharp.3.8.0\lib\net40\MathNet.Numerics.FSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MathNet.Spatial">
-      <HintPath>..\packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
