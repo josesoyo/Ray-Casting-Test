@@ -6,18 +6,18 @@
 #r @"..\packages\MathNet.Numerics.3.8.0\lib\net40\MathNet.Numerics.dll"
 #r @"..\packages\MathNet.Numerics.FSharp.3.8.0\lib\net40\MathNet.Numerics.FSharp.dll"
 
-#load "RayType.fs"
-#load "BBox.fs"
-#load "RayCore.fs"
-#load "RayCoreGrid.fs"
-#load "RandomMethods.fs"
+#load "..\RayCasting_tests/RayType.fs"
+#load "..\RayCasting_tests/BBox.fs"
+#load "..\RayCasting_tests/RayCore.fs"
+#load "..\RayCasting_tests/RayCoreGrid.fs"
+#load "..\RayCasting_tests/RandomMethods.fs"
 //#load "RayColorGrid.fs"
-#load "ObjReader.fs"
-#load "..\Sensor.fs"
+#load "..\RayCasting_tests/ObjReader.fs"
+#load "Sensor.fs"
 
 
-#load "PreprocesorGrid.fs"
-#load "RayCoreGrid.fs"
+#load "..\RayCasting_tests/PreprocesorGrid.fs"
+#load "..\RayCasting_tests/RayCoreGrid.fs"
 
 open System.IO
 open System.Windows.Forms

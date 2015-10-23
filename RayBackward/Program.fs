@@ -1,22 +1,5 @@
-﻿//  Test in which there are spheres and meshes
-//  Same scene as Test_AllScene_ExtendedSource.fsx
-//  But it includes the space partition
-
-#r @"..\packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll"
-#r @"..\packages\MathNet.Numerics.3.8.0\lib\net40\MathNet.Numerics.dll"
-#r @"..\packages\MathNet.Numerics.FSharp.3.8.0\lib\net40\MathNet.Numerics.FSharp.dll"
-
-#load "RayType.fs"
-#load "BBox.fs"
-#load "RayCore.fs"
-#load "RayCoreGrid.fs"
-#load "RandomMethods.fs"
-#load "RayColorGrid.fs"
-#load "ObjReader.fs"
-
-#load "PreprocesorGrid.fs"
-#load "RayCoreGrid.fs"
-
+﻿
+//open RayCasting_tests
 open System.IO
 open System.Windows.Forms
 open System.Drawing
@@ -45,7 +28,7 @@ let PixHeigh = 2.0/float(PixNumH)
 //let sensor = Sensor(PixWide, PixHeigh, PixNumW, PixNumH) 
  
 //Scenario1
-let camera={EyePoint=Point3D(-2.5,0.0,0.0);LookAt=Vector3D(1.5,1.e-10,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
+let camera={EyePoint=Point3D(-2.5,0.0,0.0);LookAt=Vector3D(2.5,1.e-10,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
 //let camera={EyePoint=Point3D(-2.5,-2.5,0.0);LookAt=Vector3D(1.5,1.5,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
 
 let light = {origin = Point3D(2.0,0.750,2.50);color=Color(1.0,1.0,1.0); intensity = 50.0}
@@ -88,15 +71,15 @@ let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-
 //pyramid.obj" 
 //humanoid_tri.obj" 
 //gourd.obj"/
-//difus_human |> fun x -> Translate x (Vector3D(0.0,0.0,-0.10)) |> Mesh_BBox//
+//difus_human ) |> fun x -> Translate x (Vector3D(0.0,0.0,-0.10)) |> Mesh_BBox//
 let mesh1= ReadMeshWavefront(path,difus_human)|> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))|> Mesh_BBox 
 let mesh2 = ReadMeshWavefront(path2,whitte) |> Mesh_BBox 
 //printfn "%+A" mesh1.Vertices
-let all = {Meshes = [mesh2;mesh1];Sphere = [ ball;ball2]} //  -  
+let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2 ]} // mesh2; -  ball;ball2
 //let all = {Meshes = [];Sphere = [ball2]}
 let lights ={Point= [];Circle = [clight]} //light;light2;light3;light4;light5
 //partition.
-let partition = Partitionate (all, 3)
+let partition = Partitionate (all, 2)
 
 let Scene = {Camera=camera ;World = all; Light=lights; Nsamples=20} 
 //ball;ball2;ball3;ball4;ball5
@@ -141,7 +124,6 @@ let casting (pixH:int list) =
     [rimage;gimage;bimage]
 
 let asyncasting pixW = async {return casting pixW}    // Prepare the parallel
-#time
 let mClr = [p0;p1;p2;p3] 
                   |> List.collect(fun x -> [asyncasting x])
                   |> Async.Parallel |> Async.RunSynchronously
@@ -154,9 +136,8 @@ for i in 0..(PixNumW-1) do
     for j in 0..(PixNumW-1) do
         bmp.SetPixel(i,j,Color.FromArgb(int(255.0*imager.[i,j]),  int(255.0*imageg.[i,j]) , int(255.0*imageb.[i,j]) ))
 
-#time    
 
-//bmp.Save(@"C:\Users\JoseM\Desktop\test_AllScene_gridDirLight.jpg")
+bmp.Save(@"C:\Users\JoseM\Desktop\test_AllScene_gridDirLight3organized.jpg")
 let form = new Form(Text="Rendering test",TopMost=true)
 form.Show()
 

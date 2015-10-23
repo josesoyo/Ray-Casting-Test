@@ -1,14 +1,16 @@
 ﻿// Test in which there are spheres and meshes
+//updated 22/10/2015
 
 #r @"packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll"
-#r @"packages\MathNet.Numerics.Signed.3.7.0\lib\net40\MathNet.Numerics.dll"
-#r @"packages\MathNet.Numerics.FSharp.Signed.3.7.0\lib\net40\MathNet.Numerics.FSharp.dll"
+#r @"packages\MathNet.Numerics.3.8.0\lib\net40\MathNet.Numerics.dll"
+#r @"packages\MathNet.Numerics.FSharp.3.8.0\lib\net40\MathNet.Numerics.FSharp.dll"
 
-#load "RayType.fs"
-#load "BBox.fs"
-#load "RayCore.fs"
-#load "RayColor.fs"
-#load "ObjReader.fs"
+#load "RayCasting_Tests\RayType.fs"
+#load "RayCasting_Tests\BBox.fs"
+#load "RayCasting_Tests\RayCore.fs"
+#load "RayCasting_tests/RandomMethods.fs"
+#load "RayCasting_Tests\RayColor.fs"
+#load "RayCasting_Tests\ObjReader.fs"
 
 
 open System.IO
@@ -39,9 +41,9 @@ let PixHeigh = 2.0/float(PixNumH)
 //Scenario1
 let camera={EyePoint=Point3D(6.50,-6.50, 6.75);LookAt=Vector3D(-2.20,2.20,-2.20); Up=Vector3D(0.0,0.0,1.0)}  
 
-let light = {origin =  Point3D(10.0,10.0,25.0);color=Color(1.0,1.0,1.0); intensity = 3000.0}
-let light1 = {origin = Point3D(-5.0, -10.,25.0);color=Color(1.0,1.0,1.0); intensity = 3000.0}
-let light2 = {origin = Point3D(-10.0,10.0,25.5);color=Color(1.0,1.0,1.0); intensity = 3000.0}
+let light = {origin =  Point3D(10.0,10.0,25.0);color=Color(1.0,1.0,1.0); intensity = 320.0}
+let light1 = {origin = Point3D(-5.0, -10.,25.0);color=Color(1.0,1.0,1.0); intensity = 320.0}
+let light2 = {origin = Point3D(-10.0,10.0,25.5);color=Color(1.0,1.0,1.0); intensity = 320.0}
 
 
 //
@@ -61,11 +63,11 @@ let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-
 //humanoid_tri.obj" 
 //gourd.obj"/
 
-let mesh1= ReadMeshWavefront(path,refractive) //|> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))
-let mesh2 = ReadMeshWavefront(path2,whitte)
+let mesh1= ReadMeshWavefront(path,refractive)|> Mesh_BBox //|> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))
+let mesh2 = ReadMeshWavefront(path2,whitte)|> Mesh_BBox
 //printfn "%+A" mesh1.Vertices
 let all = {Meshes = [mesh1;mesh2];Sphere = []}
-let Scene = {Camera=camera ;World = all; Light=[light;light2]} 
+let Scene = {Camera=camera ;World = all; Light={Point=[light;light2];Circle=[]};Nsamples = 0} 
 //ball;ball2;ball3;ball4;ball5
 // Scenario2
 mesh1.Bbox

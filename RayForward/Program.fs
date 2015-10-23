@@ -1,24 +1,16 @@
+﻿// Learn more about F# at http://fsharp.org
+// See the 'F# Tutorial' project for more help.
+
+(*
+[<EntryPoint>]
+let main argv = 
+    printfn "%A" argv
+    0 // return an integer exit code
+*)
+
 //  Script file with the algorithms to create  the forwardRayTracing
 //  Pre-modifications, include sensor as an object of the world (square one)
 // 
-
-#r @"..\packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll"
-#r @"..\packages\MathNet.Numerics.3.8.0\lib\net40\MathNet.Numerics.dll"
-#r @"..\packages\MathNet.Numerics.FSharp.3.8.0\lib\net40\MathNet.Numerics.FSharp.dll"
-
-#load "RayType.fs"
-#load "BBox.fs"
-#load "RayCore.fs"
-#load "RayCoreGrid.fs"
-#load "RandomMethods.fs"
-//#load "RayColorGrid.fs"
-#load "ObjReader.fs"
-#load "..\Sensor.fs"
-
-
-#load "PreprocesorGrid.fs"
-#load "RayCoreGrid.fs"
-
 open System.IO
 open System.Windows.Forms
 open System.Drawing
@@ -269,17 +261,17 @@ let partition = Partitionate (all, 2)
 let camera={EyePoint=Point3D(-20.,0.,0.);LookAt=Vector3D(992.,1.e-10,1.e-10); Up=Vector3D(1.,1.,1.)} // SHOULD NOT
 let scene = {Camera=camera ;World = all; Light=lights; Nsamples=1} 
 
-let xpix = 100
-let ypix = 100
-let pixsize = 0.01
-let photosSature = 10
+let xpix = 200
+let ypix = 200
+let pixsize = 0.00751
+let photosSature = 50
 
 let normal= UnitVector3D(0.000000001,0.0,1.0)
 let origin = Point3D(-0.50,-0.50,-0.25141666666666666) // for sphere
 //let origin = Point3D(-0.50,-5.0,5.50)  //
 //
 //let BlackSensor = InitiateSensor (origin:Point3D, normal, xpix, ypix, pixsize, photosSature)
-let MaxNrays = 5000
+let MaxNrays = 50000
 let image = 
     let mutable startSensor = InitiateSensor (origin, normal, xpix, ypix, pixsize, photosSature)
     for i in 0..(MaxNrays-1) do

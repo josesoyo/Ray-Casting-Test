@@ -29,8 +29,8 @@ let PI = 3.141592653589
 //Definitions of values
 //
 // Pixels
-let PixNumW = 200
-let PixNumH = 200
+let PixNumW = 100
+let PixNumH = 100
 let PixWide = 2.0/float(PixNumW) //Write something
 let PixHeigh = 2.0/float(PixNumH)
 //
