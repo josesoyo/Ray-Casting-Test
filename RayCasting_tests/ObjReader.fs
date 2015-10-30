@@ -104,4 +104,16 @@ let Mesh_BBox (mesh:mesh) =
   let bouncing = BBox_creation (mesh.Vertices) // should be 0's and do it after transform...
   {Vertices = mesh.Vertices; Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=bouncing}
 
+let RotateMesh mesh nrm =
+  // Rotate the mesh
+  // mesh
+  let rotateSource (nrm:UnitVector3D) =
+    //Generate a rotation matrix
+    Matrix3D.RotationTo(UnitVector3D(0.,0.,1.),nrm)
+
+  let rvert( vert:Point3D list, nrm:UnitVector3D) =
+    let matRot = rotateSource(nrm) 
+    vert |> List.collect(fun x -> [x.TransformBy(m=matRot)])
+
+  {Vertices = rvert(mesh.Vertices, nrm); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=mesh.Bbox}
 
