@@ -6,7 +6,7 @@ open MathNet.Spatial.Euclidean // requieres System.Xml
 
 open RayType
 open BBox 
-
+open RayTypeMethods
 
 ///////////////////////////////////////////////////
 //
@@ -137,4 +137,6 @@ let castRay_mesh (scene:scene, ray:RayFrom) = //here it's only for sphere
 let CastRay_nest(scene:scene, ray:RayFrom) =
     let Spheres_intersections = castRay(scene,ray) //_sphere
     let Meshes_intersections = castRay_mesh(scene,ray)
-    List.append Spheres_intersections Meshes_intersections //append is 2 lists
+    let Cylinder_intersections = castRay_cyl(scene,ray)
+    let first = List.append Spheres_intersections Meshes_intersections //append is 2 lists
+    List.append first Cylinder_intersections

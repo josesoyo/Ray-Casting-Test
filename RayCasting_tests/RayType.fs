@@ -63,26 +63,49 @@ type light = {Point: Plight list; Circle: Clight list}//;Square: Slight list }
 type RayFrom = {uvec:UnitVector3D; length: float; from:Point3D; travelled:float} //length is only for light intersection not infinity
 type RayForward = {uvec:UnitVector3D; mlength: float; from:Point3D; travelled:float; color:Color; intensity:float}
 //
-
+(* 
+type RayGaussian = {uvec:UnitVector3D; mlength: float; from:Point3D; 
+                    travelled:float;        // Works as Phase - to compute it
+                    intensity:int ;         // Works as a number of photons
+                    wl:float                // To compute the phase from dist
+                    }
+*)
 
 // Objects that can be intersecterd: Mesh and spheres
 type sphere = {center:Point3D; radius:float; material:material }
 type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list;Bbox:BBox}
+type cylinder = {Radius: float;             // Radius of the cylinder
+                 zmin:float; zmax:float;    // By definition in object space z aligned
+                 LBbox:BBox; WBbox:BBox;    // Local and world Bounding box
+                 Origin:Point3D             // Origin of the axis in real world (Translation)
+                 Normal:UnitVector3D;       // Direction of the cylinder
+                 material:material
+                 ObjToWorld:Matrix<float>;  // Transforms from (0.,0.,1.) -> Normal
+                 WorldToObj:Matrix<float>  // Transforms from Normal -> (0.,0.,1.)
+                 }
+
 (* Before BBbox
 type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list}
 
 *)
 
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
-type world = {Meshes: mesh list;Sphere:sphere list}
+type world = {Meshes: mesh list;Sphere:sphere list; Cylinder: cylinder list}
 
 
 
 // Type of the partition of the world - Uses: Cast_3DGrid (Scene,Ray,partition)
 type Grid3D= {Bbox:BBox                                                            //BBox of the 3DGrid
-              MeshID:int list; MeshTriangles: int list list list;MBBox:BBox list;  //mesh list
+              MeshID:int list; MeshTriangles: int list list list;MeshNormals:UnitVector3D list list ; MBBox:BBox list;  //mesh list
               SphID:int list; SphBox:BBox list;                                    //spheres list
               }
+              // Define Octree type
+
+type OctreeSystem=
+    |Octree of Octree
+    |Partition of Grid3D
+and Octree = {Bbox:BBox; Octree: OctreeSystem list}
+
 
 type scene = {Camera:cam; World:world; Light:light; Nsamples:int} //I create a list of Spheres - Nsamples for monteCarlo Methods
 //type scene = {Camera:cam; Sphere:sphere list; EndWorld:wall; Light:light list} //I create a list of Spheres

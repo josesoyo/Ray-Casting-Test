@@ -53,9 +53,10 @@ let InitiateSensor (origin:Point3D, normal, xpix, ypix, pixsize, photosSature) =
 
     //Color Matrices
     //let Rcolor = Double.SparseMatrix(xpix, ypix) //(fun 2 2  -> 0)        // To initialize - GOOD??
-    let Rcolor = SparseMatrix.init xpix ypix (fun i j -> 0.)       // To initialize - GOOD??
-    let Gcolor = SparseMatrix.init xpix ypix (fun i j  -> 0.)        // To initialize
-    let Bcolor = SparseMatrix.init xpix ypix (fun i j  -> 0.)        // To initialize
+    let Mcolor = SparseMatrix.init xpix ypix (fun i j -> 0.)       // To initialize - GOOD??
+    // All colors are initialized as zero...
+    //let Gcolor = SparseMatrix.init xpix ypix (fun i j  -> 0.)        // To initialize
+    //let Bcolor = SparseMatrix.init xpix ypix (fun i j  -> 0.)        // To initialize
     
     // Return the initiated sensor
     {Origin = origin;
@@ -64,7 +65,7 @@ let InitiateSensor (origin:Point3D, normal, xpix, ypix, pixsize, photosSature) =
     xpix = xpix ; ypix = ypix; pixsize = pixsize;
     RotationMatrix = RotationMatrix;
     PhotosSature = photosSature;
-    Rcolor = Rcolor; Gcolor = Gcolor; Bcolor = Bcolor
+    Rcolor = Mcolor; Gcolor = Mcolor; Bcolor = Mcolor
     }
 //
 // Methods on Sensor
@@ -87,8 +88,9 @@ let FindSensorInter(sensor:Sensor,pinter:Point3D) =
 
 let updateMatrix(xpix:int,ypix:int,xPixPos, yPixPos,value:float)=
     //Update a sparse matrix that works as the sensor
+    // Exist updateComplexMatrix in GaussianSource.fs
     let mutable maat = SparseMatrix.init xpix ypix (fun i j -> 0.)  // initiate
-    printfn "x: %i y: %i" xPixPos yPixPos
+    //printfn "x: %i y: %i" xPixPos yPixPos
     maat.[xPixPos, yPixPos] <- value                                // Update
     maat
 
@@ -99,7 +101,7 @@ let sensorUpdate(sensor:Sensor,pinter:Point3D,rayforward:RayForward) =
 
     let IntersectionAtSensor = FindSensorInter(sensor,pinter)
     let pixs = sensor.pixsize
-    printfn "xvals: %+A %f \n " (IntersectionAtSensor) pixs// IntersectionAtSensor.Y ymax
+    //printfn "xvals: %+A %f \n " (IntersectionAtSensor) pixs// IntersectionAtSensor.Y ymax
     let (xPixPos, yPixPos) = ( int(IntersectionAtSensor.X/pixs) , int(IntersectionAtSensor.Y/pixs) )
 
     let Red = updateMatrix(sensor.xpix,sensor.ypix,xPixPos, yPixPos, (rayforward.color.r*rayforward.intensity))
@@ -119,6 +121,21 @@ let sensorUpdate(sensor:Sensor,pinter:Point3D,rayforward:RayForward) =
     Rcolor = sensor.Rcolor + Red; 
     Gcolor = sensor.Gcolor + Green;
     Bcolor = sensor.Bcolor + Blue
+    }
+let sensorSum (sensor:Sensor,s2:Sensor) =
+    {
+    Origin = sensor.Origin;
+    c1 = sensor.c1; c2 = sensor.c2;
+    Normal = sensor.Normal;
+    xpix = sensor.xpix;ypix = sensor.ypix;
+    pixsize = sensor.pixsize;
+    RotationMatrix = sensor.RotationMatrix;
+    PhotosSature = sensor.PhotosSature;
+
+    // on color returns the sum between the previous number and the current one
+    Rcolor = sensor.Rcolor + s2.Rcolor; 
+    Gcolor = sensor.Gcolor + s2.Gcolor;
+    Bcolor = sensor.Bcolor + s2.Bcolor
     }
     
 let SensorToImage(sensor:Sensor,path:string) =
