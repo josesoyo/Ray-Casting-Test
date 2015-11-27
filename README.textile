@@ -8,8 +8,14 @@ It can manage:
 - Multiple reflexions and transmissions included
 - Fresnel reflexion term can be used
 - Bounding Box implemented to reduce computing time
-- Space partitioning implement, BBox of elements in a partition optimized/Redefined. (Test scene antioptimized)
+- Space partitioning implement, BBox of elements in a partition optimized/Redefined. (Test script not good to partitionate)
+- Added in the space partitioning technniques an Octree structure (test with an scene of 50000 triangles)
 - Parallel implementation throught async F# on BBox and on pixel initialization. Up to now on the initialization only creates 4 procces and cannot be modified. Great Speed-up obtained.
+
+Octree Test with 50k triangles:
+!https://pbs.twimg.com/media/CU0o-PHWoAA34rp.png(Testlist)!
+Currently this scene is on program.fs
+The computing time was: *Real: 02:31:33.620, CPU: 07:48:39.953*
 
 Previous example with an extended light illuminating the scene:
 !https://pbs.twimg.com/media/CQPlowJWEAMID99.png(Testlist)!
