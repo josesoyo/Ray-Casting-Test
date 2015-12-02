@@ -1,4 +1,5 @@
 ﻿// Test in which there are spheres and meshes
+//Ball lens changed by a lens biconcave or biconvex
 
 #r @"..\packages\MathNet.Spatial.0.2.0-alpha\lib\net40\MathNet.Spatial.dll"
 #r @"..\packages\MathNet.Numerics.3.8.0\lib\net40\MathNet.Numerics.dll"
@@ -6,6 +7,7 @@
 
 #load "RayType.fs"
 #load "BBox.fs"
+#load "RayTypeMethods.fs"
 #load "RayCore.fs"
 #load "RandomMethods.fs"
 #load "RayColor.fs"
@@ -20,6 +22,7 @@ open MathNet.Spatial.Euclidean // requieres System.Xml
 
 open ObjReader
 open RayType
+open RayTypeMethods
 open RayCore
 open RayColor
 
@@ -29,8 +32,8 @@ let PI = 3.141592653589
 //Definitions of values
 //
 // Pixels
-let PixNumW = 100
-let PixNumH = 100
+let PixNumW = 200
+let PixNumH = 200
 let PixWide = 2.0/float(PixNumW) //Write something
 let PixHeigh = 2.0/float(PixNumH)
 //
@@ -64,6 +67,15 @@ let whitte ={DiffuseLight = Color(1.0,1.0,1.0);SpecularLight = Color(0.51,0.51,0
 let ball = {center=Point3D(1.0,0.20,-0.50); radius=0.250; material=refractive } //0.7,0.2,0.0
 let ball2 = {center=Point3D(10.0,-1.50,1.0); radius=1.965; material=reflective }
 //let ball3 = {center = Point3D(3.8125, 0.38, 1.5); radius = 1. ; material= difus}
+//
+// Lens
+let (r1,r2) = (0.75025,0.75025)
+let axis = UnitVector3D(0.5,0.,0.)
+let (th,dia) = (0.25, 0.5)
+let stP = Point3D(-1.20,-0.,-0.0) //Point3D(1.0,0.20,0.50)
+let(ls1,lcyl,ls2) = CreateLensBiConvex(r1, r2, axis, th, dia, stP, refractive)
+//let(ls1,lcyl,ls2) = CreateLensBiConcave(r1, r2, axis, th, dia, stP, refractive)
+//
 // meshes
 let path = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\MeshSamples\humanoid_tri.obj"
 let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-Casting-Test\MeshSamples\plane.obj"
@@ -74,7 +86,10 @@ let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-
 let mesh1= ReadMeshWavefront(path,difus_human) |> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))|> Mesh_BBox 
 let mesh2 = ReadMeshWavefront(path2,whitte) |> Mesh_BBox 
 //printfn "%+A" mesh1.Vertices
-let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2]}
+//let all = {Meshes = [mesh1;mesh2];Sphere = [ball;ball2]; Cylinder =[];PartSphere=[]}
+let all = {Meshes = [mesh2;mesh1]; 
+           Sphere = [ball2 ];PartSphere= []; SurfaceLens = [ls1;ls2] ;
+           Cylinder =[lcyl]} 
 let lights ={Point= [];Circle = [clight]} //light;light2;light3;light4;light5
 
 let Scene = {Camera=camera ;World = all; Light=lights; Nsamples=25} 
@@ -90,10 +105,13 @@ let bmp = new Bitmap(PixNumW,PixNumH)
 
 //Backward ray tracing, from cam to light
 
-let p0 = [0..4..PixNumH-1]
-let p1 = [1..4..PixNumH-1]
-let p2 = [2..4..PixNumH-1]
-let p3 = [3..4..PixNumH-1]
+//let p0 = [0..4..PixNumH-1]
+//let p1 = [1..4..PixNumH-1]
+//let p2 = [2..4..PixNumH-1]
+//let p3 = [3..4..PixNumH-1]
+let Nproc = 4
+let pi =[0..(Nproc-1)] |> List.collect(fun x -> [[x..Nproc..PixNumH-1]])
+
 //Backward ray tracing, from cam to light
 let casting (pixH:int list) =
     let mutable rimage = DenseMatrix.init PixNumW PixNumH (fun i j -> 0.0)
@@ -114,7 +132,7 @@ let casting (pixH:int list) =
                 | _ ->  let color = GlobalIllum(intersects |>List.minBy(fun x -> x.t), Scene  )//colorAt (intersects |>List.minBy(fun x -> x.t), Scene  )
                             //(fun x -> x) |> |> List.head S
                         //printfn "Color is: %+A" color
-                        rimage.[i,j] <- color.b
+                        rimage.[i,j] <- color.r
                         gimage.[i,j] <- color.g 
                         bimage.[i,j] <- color.b
         if i%100=0 then printfn "%i" i
@@ -122,14 +140,29 @@ let casting (pixH:int list) =
 
 let asyncasting pixW = async {return casting pixW}    // Prepare the parallel
 #time
-let mClr = [p0;p1;p2;p3] 
+let mClr = pi//[p0;p1;p2;p3] 
                   |> List.collect(fun x -> [asyncasting x])
                   |> Async.Parallel |> Async.RunSynchronously
                   |> Array.toList |> List.collect(fun x -> x)
 
+(*
 let imager = mClr.[0] + mClr.[3] + mClr.[6] + mClr.[9]      // Red
 let imageg = mClr.[1] + mClr.[4] + mClr.[7] + mClr.[10]     //Green
 let imageb = mClr.[2] + mClr.[5] + mClr.[8] + mClr.[11]     //Blue
+*)
+let imagergb = 
+    let mutable er = DenseMatrix.init PixNumW PixNumH (fun i j -> 0.0)
+    let mutable eg = DenseMatrix.init PixNumW PixNumH (fun i j -> 0.0)
+    let mutable eb = DenseMatrix.init PixNumW PixNumH (fun i j -> 0.0)
+    for i in [0..3..mClr.Length-1] do
+        er <- (mClr.[i]+er)//mClr.[i-3])
+        eg <- (mClr.[i+1]+eg)//mClr.[i-2])
+        eb <- (mClr.[i+2]+eb)//mClr.[i-1])
+    [er;eg;eb]
+
+let imager = imagergb.[0]
+let imageg = imagergb.[1]
+let imageb =imagergb.[2]
 for i in 0..(PixNumW-1) do
     for j in 0..(PixNumW-1) do
         bmp.SetPixel(i,j,Color.FromArgb(int(255.0*imager.[i,j]),  int(255.0*imageg.[i,j]) , int(255.0*imageb.[i,j]) ))

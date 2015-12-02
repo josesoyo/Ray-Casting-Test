@@ -181,12 +181,12 @@ let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int,octree:Octre
 and TransmittedRay (intersection:Intersection,scene:scene,dpt:int,octree:OctreeSystem list) =
     let RayDir = intersection.ray.uvec
     let LightDir = RayDir.Negate() //Ray that incides on the surface * -1
-    let SideRay (ci,index) =   
+    let SideRay (ci,index, nrm:UnitVector3D) =   
         // Changes the situation checking from air or to  
        if ci < 0.  then 
-        (-ci, 1./index) 
+        (-ci, 1./index,nrm.Negate()) 
        else
-        (ci, index)
+        (ci, index,nrm)
     let n = intersection.material.n // With AIR
     let ci = intersection.normal.DotProduct(LightDir) //Cosinus incident angle
     (*
@@ -195,7 +195,7 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int,octree:OctreeS
         printfn "Hola" 
     else
         printfn "ciao"   *)    
-    let (cos_inc,nu) = SideRay(ci, n)
+    let (cos_inc,nu,normal) = SideRay(ci, n,intersection.normal)
     let inv_n = 1./nu // It is used the inverse = (n_from/n_to)
     let AngCritic n_transm =
         // Obtain Critical angle for TIR
@@ -209,7 +209,7 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int,octree:OctreeS
 
     if ang_inc < ang_critic then // TIR
         let cos_trans = sqrt(1.-(inv_n*inv_n )*(1.-cos_inc*cos_inc)) // Cosinus transmited
-        let vtrans = RayDir.ScaleBy(inv_n) - intersection.normal.ScaleBy(cos_trans - inv_n*cos_inc)
+        let vtrans = RayDir.ScaleBy(inv_n) - normal.ScaleBy(cos_trans - inv_n*cos_inc) // intersection.normal
         let TransRay = {uvec=vtrans.Normalize();length=infinity; from =intersection.point;travelled=intersection.ray.travelled}
         // Ray.length is created to allow shadows, it's not required more, so it creates a problem if it's not infinity intersecting objects
         let intersects = Cast_Octree(scene, TransRay,octree)//CastRay_nest (scene, TransRay)

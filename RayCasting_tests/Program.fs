@@ -22,8 +22,8 @@ let PI = 3.141592653589
 //Definitions of values
 //
 // Pixels
-let PixNumW = 500
-let PixNumH = 500
+let PixNumW = 200
+let PixNumH = 200
 let PixWide = 2.0/float(PixNumW) //Write something
 let PixHeigh = 2.0/float(PixNumH)
 //
@@ -31,7 +31,7 @@ let PixHeigh = 2.0/float(PixNumH)
 //let sensor = Sensor(PixWide, PixHeigh, PixNumW, PixNumH) 
  
 //Scenario1
-let camera={EyePoint=Point3D(-2.5,0.0,-0.250);LookAt=Vector3D(1.7,1.e-10,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
+let camera={EyePoint=Point3D(-2.5,0.0,-0.250);LookAt=Vector3D(5.95,1.e-10,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
 //let camera={EyePoint=Point3D(-2.5,-2.5,0.0);LookAt=Vector3D(1.5,1.5,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
 
 let light = {origin = Point3D(2.0,0.750,3.0);color=Color(1.0,1.0,1.0); intensity = 50.0}
@@ -56,7 +56,7 @@ let clight = {Centre=Point3D(-1.10,-0.50,5.0); Normal=UnitVector3D(0.50,0.5,-1.0
 //
 // scene
 // Materials
-let refractive= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.95,0.95,0.99);shinness= 60; R=0.01; T=0.99; n= 1.95;Fresnel=true} 
+let refractive= {DiffuseLight = Color(0.001,0.001,0.0175);SpecularLight = Color(0.795,0.795,0.799);shinness= 60; R=0.01; T=0.99; n= 1.95;Fresnel=true} 
 let reflective ={DiffuseLight = Color(0.29,0.590,0.29);SpecularLight = Color(0.9,0.9,0.9);shinness= 50; R=0.250; T=0.0; n= 1.45;Fresnel = false} 
 let difus_human = {DiffuseLight = Color(0.25,0.70,0.4);SpecularLight = Color(0.3,0.2,0.5);shinness= 80; R=0.80; T=0.0; n= 1.45;Fresnel = false}
 let whitte ={DiffuseLight = Color(1.0,1.0,1.0);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=0.0450; T=0.0; n= 1.45;Fresnel = false}
@@ -88,18 +88,20 @@ let mesh2 = ReadMeshWavefront(path2,whitte) |> Mesh_BBox
 
 let mesht = ReadMeshWavefront(path3,refractive)|> fun x -> Scale x [0.25;0.25;0.25] 
 let mesh3 = [-1..5] |> List.collect(fun x ->( [-3..7]|>List.collect(fun y -> [(Translate mesht (Vector3D(0.6*float(x),0.7*float(y),-1.0))|> Mesh_BBox)]) ))
-//mesh1.Triangles.Length
+//mesht.Triangles.Length
 //mesh3.Length
 //648*77 
 
-let all = {Meshes = ([mesh2;mesh15;mesh1]@mesh3);Sphere = [ball;ball2 ];Cylinder =[]} // mesh2; -  ball;ball2
+let all = {Meshes = [mesh2;mesh1]; //;mesh15 @mesh3
+           Sphere = [ball;ball2 ];PartSphere= []; SurfaceLens = [] ;
+           Cylinder =[]} // mesh2; -  ball;ball2
 
 let lights ={Point= [light];Circle = [clight]} //light;light2;light3;light4;light5
 //partition.
 let pPartition = Partitionate (all, 1)
 // Octree
 //#time // In case of execute as a script
-let partition =  OctreeSubdivision (all, WorldLimitsExtend (all),45,0,9)
+let partition =  OctreeSubdivision (all, WorldLimitsExtend (all),45,0,6)
 //#time // In case of execute as a script
 let Scene = {Camera=camera ;World = all; Light=lights; Nsamples=20} 
 //ball;ball2;ball3;ball4;ball5
@@ -159,16 +161,30 @@ let casting (scene:scene, partition, pPartition ,pixH:int list) =
     [rimage;gimage;bimage]
 
 let asyncasting (scene:scene, partition, pPartition, pixW) = async {return casting (scene, partition, pPartition, pixW)}    // Prepare the parallel
-// #time // In case of use as a script
+//#time // In case of use as a script
 let mClr = pi//[p0;p1;p2;p3] 
                   |> List.collect(fun x -> [asyncasting (Scene, partition, pPartition,x)])
                   |> Async.Parallel |> Async.RunSynchronously
                   |> Array.toList |> List.collect(fun x -> x)
 //#time // In case of execute as a script
+let imagergb = 
+    let mutable er = DenseMatrix.init PixNumW PixNumH (fun i j -> 0.0)
+    let mutable eg = DenseMatrix.init PixNumW PixNumH (fun i j -> 0.0)
+    let mutable eb = DenseMatrix.init PixNumW PixNumH (fun i j -> 0.0)
+    for i in [0..3..mClr.Length-1] do
+        er <- (mClr.[i]+er)//mClr.[i-3])
+        eg <- (mClr.[i+1]+eg)//mClr.[i-2])
+        eb <- (mClr.[i+2]+eb)//mClr.[i-1])
+    [er;eg;eb]
 
+let imager = imagergb.[0]
+let imageg = imagergb.[1]
+let imageb =imagergb.[2]
+(*
 let imager = mClr.[0] + mClr.[3] + mClr.[6] + mClr.[9] + mClr.[12]  + mClr.[15] // Red
 let imageg = mClr.[1] + mClr.[4] + mClr.[7] + mClr.[10] + mClr.[13]  + mClr.[16]    //Green
 let imageb = mClr.[2]+ mClr.[5] + mClr.[8] + mClr.[11] + mClr.[14]   + mClr.[17]   //Blue
+*)
 //let (imager,imageg,imageb) = [0..mClr.Length-1]
 for i in 0..(PixNumW-1) do
     for j in 0..(PixNumH-1) do
@@ -176,7 +192,7 @@ for i in 0..(PixNumW-1) do
         bmp.SetPixel(i,j,Color.FromArgb(int(255.0*imager.[i,j]),  int(255.0*imageg.[i,j]) , int(255.0*imageb.[i,j]) ))
 
 //bmp.Save(@"C:\Users\JoseM\Desktop\test_AllScene_gridDirLight3.jpg")
-bmp.Save(@"C:\Users\JoseM\Desktop\img_render\comparative\test_Scene2_Octree2.jpg")
+bmp.Save(@"C:\Users\JoseM\Desktop\img_render\comparative\test_Scene2_Octree22.jpg")
 let form = new Form(Text="Rendering test",TopMost=true)
 form.Show()
 

@@ -73,6 +73,20 @@ type RayGaussian = {uvec:UnitVector3D; mlength: float; from:Point3D;
 
 // Objects that can be intersecterd: Mesh and spheres
 type sphere = {center:Point3D; radius:float; material:material }
+type partSphere = {Sphere:sphere; 
+                   zmin:float;zmax:float;
+                   phimin:float;phimax:float;
+                   ObjToWorld:Matrix<float>;  // Transforms from (0.,0.,1.) -> Normal
+                   WorldToObj:Matrix<float>  // Transforms from Normal -> (0.,0.,1.)                   
+                  }
+type SphSurfaceLens = { Sphere:sphere ;
+                        CosMin: float;
+                        Axis: UnitVector3D;
+                        Convex:bool; // Convex = convergent (normal sphere) 
+                      } // Name because will be the surface of a lens
+                      
+                     
+
 type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:material;normals: UnitVector3D list;Bbox:BBox}
 type cylinder = {Radius: float;             // Radius of the cylinder
                  zmin:float; zmax:float;    // By definition in object space z aligned
@@ -90,7 +104,9 @@ type mesh = {Vertices:Point3D list ; Triangles: int list list;  material:materia
 *)
 
 type cam = {EyePoint:Point3D; LookAt:Vector3D; Up:Vector3D}//; film:Sensor}
-type world = {Meshes: mesh list;Sphere:sphere list; Cylinder: cylinder list}
+type world = {Meshes: mesh list;
+              Sphere:sphere list; PartSphere:partSphere list ; SurfaceLens: SphSurfaceLens list;
+              Cylinder: cylinder list}
 
 
 

@@ -75,6 +75,7 @@
     <None Include="Test_ForwardRay.fsx" />
     <None Include="Test_ForwardPhase.fsx" />
     <None Include="Test_MichelsonMorley.fsx" />
+    <None Include="Test_lens.fsx" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

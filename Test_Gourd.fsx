@@ -66,7 +66,7 @@ let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-
 let mesh1= ReadMeshWavefront(path,refractive)|> Mesh_BBox //|> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))
 let mesh2 = ReadMeshWavefront(path2,whitte)|> Mesh_BBox
 //printfn "%+A" mesh1.Vertices
-let all = {Meshes = [mesh1;mesh2];Sphere = []}
+let all = {Meshes = [mesh1;mesh2];Sphere = [];Cylinder=[]}
 let Scene = {Camera=camera ;World = all; Light={Point=[light;light2];Circle=[]};Nsamples = 0} 
 //ball;ball2;ball3;ball4;ball5
 // Scenario2
@@ -96,7 +96,7 @@ for i in 0..(PixNumW-1) do
     if i%20=0 then printfn "%i" i
 
 
-bmp.Save(@"C:\Users\JoseM\Desktop\test_gourd_bbox.jpg")
+//bmp.Save(@"C:\Users\JoseM\Desktop\test_gourd_bbox.jpg")
 
 let form = new Form(Text="Rendering test",TopMost=true)
 form.Show()

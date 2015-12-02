@@ -7,6 +7,7 @@
 #r @"..\packages\MathNet.Numerics.FSharp.3.8.0\lib\net40\MathNet.Numerics.FSharp.dll"
 
 #load "RayType.fs"
+#load "RayTypeMethods.fs"
 #load "BBox.fs"
 #load "RayCore.fs"
 #load "RayCoreGrid.fs"
@@ -46,27 +47,28 @@ let PixHeigh = 2.0/float(PixNumH)
  
 //Scenario1
 let camera={EyePoint=Point3D(-2.5,0.0,0.0);LookAt=Vector3D(1.5,1.e-10,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
-//let camera={EyePoint=Point3D(-2.5,-2.5,0.0);LookAt=Vector3D(1.5,1.5,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
+//let camera={EyePoint=Point3D(-2.5,-2.5,0.50);LookAt=Vector3D(2.55,2.55,1.e-10); Up=Vector3D(0.0,0.0,1.0)}
 
 let light = {origin = Point3D(2.0,0.750,2.50);color=Color(1.0,1.0,1.0); intensity = 50.0}
 let light2 = {origin = Point3D(0.00,-2.0,-1.50);color=Color(1.0,1.0,1.0); intensity = 150.0}
 let light3 = {origin = Point3D(4.50,0.0,1.0);color=Color(1.0,1.0,1.0); intensity = 190.0}
 let light4 = {origin = Point3D(-1.00,2.50,5.0);color=Color(1.0,1.0,1.0); intensity = 99.0}
 let light5= {origin = Point3D(11.7500,0.0,1.0);color=Color(1.0,1.0,1.0); intensity = 200.0}
-(*
-let clight = {Centre=Point3D(-0.0,-1.0,5.0); Normal=UnitVector3D(0.50,0.0,-1.0);
+(*let clight = {Centre=Point3D(-0.0,-1.0,5.0); Normal=UnitVector3D(0.50,0.0,-1.0);
                Radius=2.0;Area=PI; 
                color=Color(1.0,1.0,0.950); 
                intensityDensity=100000.;
                RotationMatrix=Matrix3D.RotationTo(UnitVector3D(0.,0.,1.),UnitVector3D(0.50,0.0,-1.0))
                }
 *)
-let clight = {Centre=Point3D(-1.10,-0.50,5.0); Normal=UnitVector3D(0.50,0.5,-1.0);
+let clight = {Centre=Point3D(-1.10,-0.50,5.0); Normal=UnitVector3D(0.50,0.,-1.0);
                Radius=2.0;Area=PI; 
                color=Color(1.0,1.0,0.950); 
                intensityDensity=100.;
                RotationMatrix=Matrix3D.RotationTo(UnitVector3D(0.,0.,1.),UnitVector3D(0.50,0.0,-1.0))
                }
+
+
 //
 // scene
 // Materials
@@ -89,14 +91,15 @@ let path2 = @"C:\Users\JoseM\OneDrive\Phd\render\ray casting\RayCastingTest\Ray-
 //humanoid_tri.obj" 
 //gourd.obj"/
 //difus_human |> fun x -> Translate x (Vector3D(0.0,0.0,-0.10)) |> Mesh_BBox//
-let mesh1= ReadMeshWavefront(path,difus_human)|> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))|> Mesh_BBox 
+let mesh1= ReadMeshWavefront(path,difus_human)|> fun x -> Scale x [0.25;0.25;0.25]|> fun x -> Translate x (Vector3D(3.50,1.0,-2.0))|> Mesh_BBox
+// //|> fun x -> Translate x (Vector3D(1.0,1.0,0.50))
 let mesh2 = ReadMeshWavefront(path2,whitte) |> Mesh_BBox 
 //printfn "%+A" mesh1.Vertices
-let all = {Meshes = [mesh2;mesh1];Sphere = [ ball;ball2]} //  -  
+let all = {Meshes = [ mesh2;mesh1];Sphere = [ ball;ball2]; Cylinder =[]} //  - 
 //let all = {Meshes = [];Sphere = [ball2]}
 let lights ={Point= [];Circle = [clight]} //light;light2;light3;light4;light5
 //partition.
-let partition = Partitionate (all, 3)
+let partition = Partitionate (all, 2)
 
 let Scene = {Camera=camera ;World = all; Light=lights; Nsamples=20} 
 //ball;ball2;ball3;ball4;ball5
@@ -165,3 +168,9 @@ form.Controls.Add(img)
 
 img.Image <- bmp
 printfn "end"
+
+let a = [[];[2;3]]
+let delEmpty (a: int list) =
+    if a.Length <> 0 then [a]
+    else []
+a|> List.collect(fun x-> delEmpty(x))

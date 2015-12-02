@@ -213,7 +213,7 @@ let ComplexMonosensorUpdate(sensor:ComplexMonoSensor,pinter:Point3D,rayforward:R
     let (xPixPos, yPixPos) = ( int(IntersectionAtSensor.X/pixs) , int(IntersectionAtSensor.Y/pixs) )
     let phase = ((rayforward.travelled/wl)*2.*PI)%(2.*PI)
 
-    printfn "phase: %f \t travelled: %f and point %+A "phase rayforward.travelled pinter
+    //printfn "phase: %f \t travelled: %f and point %+A "phase rayforward.travelled pinter
     let ComplexVal = ComplexPolar(rayforward.intensity, phase)
     let RMat = updateMatrix(sensor.xpix,sensor.ypix,xPixPos, yPixPos, ComplexVal.Real)
     let IMat = updateMatrix(sensor.xpix,sensor.ypix,xPixPos, yPixPos, ComplexVal.Imaginary) // Original
@@ -387,7 +387,7 @@ let ComplexsensorUpdate(sensor:ComplexSensor,pinter:Point3D,rayforward:RayForwar
     let (xPixPos, yPixPos) = ( int(IntersectionAtSensor.X/pixs) , int(IntersectionAtSensor.Y/pixs) )
     let phase = ((rayforward.travelled/wl)*2.*PI)%(2.*PI)
 
-    printfn "phase: %f \t travelled: %f and point %+A "phase rayforward.travelled pinter
+    //printfn "phase: %f \t travelled: %f and point %+A "phase rayforward.travelled pinter
     let ComplexVal = ComplexPolar(rayforward.intensity, phase)
     let Sval = updateComplexMatrix(sensor.xpix,sensor.ypix,xPixPos, yPixPos, ComplexVal)
     

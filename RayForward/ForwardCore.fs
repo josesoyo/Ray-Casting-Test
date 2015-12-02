@@ -104,16 +104,16 @@ let TransmittedRay (ray:RayForward, intersection) =
     //
     let RayDir = ray.uvec
     let LightDir = RayDir.Negate() //Ray that incides on the surface * -1
-    let SideRay (ci,index) =   
+    let SideRay (ci,index, normal:UnitVector3D) =   
         // Changes the situation checking from air or to  
        if ci < 0.  then 
-        (-ci, 1./index) 
+        (-ci, 1./index, normal.Negate()) 
        else
-        (ci, index)
+        (ci, index, normal)
     let n = intersection.material.n // With AIR
     let ci = intersection.normal.DotProduct(LightDir) //Cosinus incident angle
  
-    let (cos_inc,nu) = SideRay(ci, n)
+    let (cos_inc,nu,vnormal) = SideRay(ci, n,intersection.normal)
     let inv_n = 1./nu // It is used the inverse = (n_from/n_to)
     let AngCritic n_transm =
         // Obtain Critical angle for TIR
@@ -127,7 +127,7 @@ let TransmittedRay (ray:RayForward, intersection) =
     //
     if ang_inc < ang_critic then // TIR
         let cos_trans = sqrt(1.-(inv_n*inv_n )*(1.-cos_inc*cos_inc)) // Cosinus transmited
-        let vtrans = RayDir.ScaleBy(inv_n) - intersection.normal.ScaleBy(cos_trans - inv_n*cos_inc)
+        let vtrans = RayDir.ScaleBy(inv_n) - vnormal.ScaleBy(cos_trans - inv_n*cos_inc)
         let newvect = vtrans.Normalize()
         {uvec=newvect; mlength=ray.mlength; 
          from=intersection.point; travelled=(intersection.t+ray.travelled); 

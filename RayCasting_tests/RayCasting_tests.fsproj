@@ -75,6 +75,7 @@
     <None Include="Test_AllScene_ExtendedSource.fsx" />
     <None Include="Test_PreProcessorGrid.fsx" />
     <None Include="TestOctree.fsx" />
+    <None Include="Test_Render_PartialSph_Cylinders.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Charting">

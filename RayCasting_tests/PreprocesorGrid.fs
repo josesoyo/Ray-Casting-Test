@@ -381,7 +381,20 @@ let SphereToGrid (box:BBox, sphs: sphere list) =
     let sphBBoxs = sphID|> List.collect(fun x -> [SphBBoxInBox (sphs.[x], box)]) 
     // SphBBoxInBox works because I already know it's inside
     (sphID,sphBBoxs)
-   
+let CylinderToGrid(box:BBox, cyls:cylinder list) =
+    // Copy and paste from SphereToGrid
+    let  IDList (i:int ,bol:bool) =
+        if bol then [i]
+        else []
+    let cylbool = [0..(cyls.Length-1)]  |> List.map(fun x -> BoxBoxIntersection(box,cyls.[x].WBbox))
+    let CylID = [0..(cyls.Length-1)] |> List.map(fun x -> (x, cylbool.[x]))
+                 |> List.collect(fun x -> IDList x) 
+    let cylBBox = CylID |> List.map(fun x -> BoxofIntersection(cyls.[x].WBbox,box))
+    (CylID,cylBBox)
+
+
+
+
 let Partitionate (world:world,part:int)=
     // The result must be a list of Grid3D
     let limits = WorldLimits (world) // Bounding box of all the elements that create the world

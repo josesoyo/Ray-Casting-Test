@@ -7,6 +7,7 @@
 #r @"..\packages\MathNet.Numerics.FSharp.3.8.0\lib\net40\MathNet.Numerics.FSharp.dll"
 
 #load "..\RayCasting_tests/RayType.fs"
+#load "..\RayCasting_tests/RayTypeMethods.fs"
 #load "..\RayCasting_tests/BBox.fs"
 #load "..\RayCasting_tests/RayCore.fs"
 #load "..\RayCasting_tests/RayCoreGrid.fs"
@@ -99,16 +100,16 @@ let TransmittedRay (ray:RayForward, intersection) =
     //
     let RayDir = ray.uvec
     let LightDir = RayDir.Negate() //Ray that incides on the surface * -1
-    let SideRay (ci,index) =   
+    let SideRay (ci,index, normal:UnitVector3D) =   
         // Changes the situation checking from air or to  
        if ci < 0.  then 
-        (-ci, 1./index) 
+        (-ci, 1./index, normal.Negate()) 
        else
-        (ci, index)
+        (ci, index, normal)
     let n = intersection.material.n // With AIR
     let ci = intersection.normal.DotProduct(LightDir) //Cosinus incident angle
  
-    let (cos_inc,nu) = SideRay(ci, n)
+    let (cos_inc,nu,vnormal) = SideRay(ci, n,intersection.normal)
     let inv_n = 1./nu // It is used the inverse = (n_from/n_to)
     let AngCritic n_transm =
         // Obtain Critical angle for TIR
@@ -122,7 +123,7 @@ let TransmittedRay (ray:RayForward, intersection) =
     //
     if ang_inc < ang_critic then // TIR
         let cos_trans = sqrt(1.-(inv_n*inv_n )*(1.-cos_inc*cos_inc)) // Cosinus transmited
-        let vtrans = RayDir.ScaleBy(inv_n) - intersection.normal.ScaleBy(cos_trans - inv_n*cos_inc)
+        let vtrans = RayDir.ScaleBy(inv_n) - vnormal.ScaleBy(cos_trans - inv_n*cos_inc)
         vtrans.Normalize()
     else  ReflectedRay (ray, intersection) // Else reflected
     //
@@ -266,7 +267,8 @@ let Glass ={DiffuseLight = Color(0.90,0.90,0.990);SpecularLight = Color(0.51,0.5
 let Mirror ={DiffuseLight = Color(0.90,0.90,0.990);SpecularLight = Color(0.51,0.51,0.51);shinness= 6; R=1.0; T=0.0; n= 1.3;Fresnel = false}
 let sph = {center = Point3D(0.0,0.0,0.0) ; radius = 0.25 ; material = Glass}
 let cyl = GenerateCylinder(0.5,0.,0.1,Point3D(0.,0.0,0.),UnitVector3D(0.,0.0,1.), Mirror)
-let all = {Meshes = [];Sphere = [sph];Cylinder=[]} //for sphere
+let all = {Meshes = [];Sphere = [sph];PartSphere=[]; SurfaceLens =[]; 
+           Cylinder=[]} //for sphere
 //let all = {Meshes = [mesh1];Sphere = []} //Mesh
 
 let partition = Partitionate (all, 2)
@@ -279,7 +281,7 @@ let pixsize = 0.01
 let photosSature = 10
 
 let normal= UnitVector3D(0.000000001,0.0,1.0)
-let origin = Point3D(-0.50,-0.50,-0.25141666666666666) // for sphere
+let origin = Point3D(-0.50,-0.50,-0.541666666666666) // for sphere
 //let origin = Point3D(-0.50,-5.0,5.50)  //
 //
 //let BlackSensor = InitiateSensor (origin:Point3D, normal, xpix, ypix, pixsize, photosSature)
@@ -302,21 +304,16 @@ let ryiwant = {uvec= UnitVector3D(0.001,0.0001,-1.0);length= infinity; from = Po
 let  aa = castRay_mesh(scene, ryiwant) 
 scene.World.Meshes.[0].Bbox
 partition.[4]
-
 let Cast_3DGrid2 (scene,ray,grid:Grid3D list) =
     let listGrid = partitiongrid//scene.Grid3D
-
-
 ////
 ////
 open BBox
-
 let  Grid_IDList (i:int ,grid:Grid3D list, ray) =
     let bool = BBox_intersec( grid.[i].Bbox, ray)
     printfn "%+A \n ray: %+A" grid.[i].Bbox ray
     if bool then [i]
     else []
-
 Grid_IDList(0, partition,ryiwant)
 partition.[3]
 ///
@@ -324,8 +321,8 @@ partition.[3]
 let IntListGrid = [0..(listGrid.Length-1)]      // Gives the list of partitions that are intersected
                     |> List.collect(fun x -> Grid_IDList(0, listGrid,ray)) // index of grid with intersections
                     |> List.collect(fun x ->[listGrid.[x]])              //Partitions that intersect
-
     // Do the intersections with the spheres and meshes
     //printfn "%+A" IntListGrid
     IntListGrid 
 *)
+printfn "Carefull with the focus point!!!"
