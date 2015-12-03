@@ -210,7 +210,7 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
                         |> List.filter (fun x -> x.t > 0.00) 
                         |> List.collect(fun x -> [x.point])
                 let intersecCub = triangleRays |> List.collect( fun x -> cubeIntersected (x,cubeMesh) )
-                printfn " Pointes are: %+A" intersecCub
+                //printfn " Pointes are: %+A" intersecCub
                 List.append intersecTRI intersecCub
         let triangles = mesh.Triangles
         let PBoundaries = [0..(triangles.Length-1)] 
@@ -247,7 +247,7 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
             if onLimits = [] then false
             else true
         let resultat = (bselect,bonLimits)
-        printfn "doublebol %+A" resultat
+        //printfn "doublebol %+A" resultat
         match resultat with
         |(false,false) -> //  ERROR - emty empty
                     {Pmin=[];
@@ -258,7 +258,7 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
                           {Pmin=[List.min(listxl); List.min(listyl); List.min(listzl)];
                           Pmax=[List.max(listxl); List.max(listyl); List.max(listzl)]}
         | (true,false) -> // No intersection on the limits
-                          printfn "Vertices Limits: %+A" cubeMesh.Bbox  //onLimits
+                          //printfn "Vertices Limits: %+A" cubeMesh.Bbox  //onLimits
                           let listx = select |> List.collect(fun x -> [vertexs.[x].X]) 
                           let listy = select  |> List.collect(fun x -> [vertexs.[x].Y])
                           let listz = select  |> List.collect(fun x -> [vertexs.[x].Z])
@@ -285,7 +285,11 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
             // The booleans of the triangles intercepted are changed by the triangle
             // trianglesBool1MEsh = The list of triangles that is a bool. True = triangle intercepted by the partition
             [0..trianglesBool1MEsh.Length-1] |> List.collect(fun x -> IDList(x,trianglesBool1MEsh.[x]))
-            |> List.collect(fun x -> [mesh.Triangles.[x]])
+            |> List.collect(fun x -> [mesh.Triangles.[x]])        
+        let NormalsFromBoolToVertice (trianglesBool1MEsh:bool list,mesh:mesh) = 
+            // The booleans of the triangles also works for normals
+            [0..trianglesBool1MEsh.Length-1] |> List.collect(fun x -> IDList(x,trianglesBool1MEsh.[x]))
+            |> List.collect(fun x -> [mesh.normals.[x]])
         let MeshIDFromTriangles (boolTriangles:bool list, i:int) =
             // It iterates in each one of the meshes to see if one triangle is intersected with the partition
             let IsThereTriangleIntersection = [0..(boolTriangles.Length-1)]|> List.collect(fun x -> IDList(x,boolTriangles.[x]) )
@@ -295,9 +299,20 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
         let MeshID = [0..(trianglesInMeshesIntersected.Length-1)]
                         |> List.collect(fun x -> MeshIDFromTriangles(trianglesInMeshesIntersected.[x],fstMeshID.[x]) ) 
                         //|> List.collect(fun x-> IDList(0,x)) |>List.iteri(fun i x -> IDList(i,x) )
+        
+        // If I don't create those two fnunctions then empty list can be created...
+        let delNullVert(a:int list list) =
+            if a.Length<>0 then [a]
+            else []        
+        let delNullNorm(a:UnitVector3D list) =
+            if a.Length<>0 then [a]
+            else []
+
         let MeshTriangles = [0..(trianglesInMeshesIntersected.Length-1)] ////CArefull with the mesh number
-                            |> List.collect(fun x -> [TriangleFromBoolToVertice(trianglesInMeshesIntersected.[x],meshes.[fstMeshID.[x]])]) 
-        (MeshID, MeshTriangles)
+                            |> List.collect(fun x -> delNullVert(TriangleFromBoolToVertice(trianglesInMeshesIntersected.[x],meshes.[fstMeshID.[x]]))) 
+        let MeshNormals = [0..(trianglesInMeshesIntersected.Length-1)] ////CArefull with the mesh number
+                            |> List.collect(fun x -> delNullNorm(NormalsFromBoolToVertice(trianglesInMeshesIntersected.[x],meshes.[fstMeshID.[x]]))) 
+        (MeshID, MeshTriangles,MeshNormals)
 
           
     let AllMeshesIter (gbox:BBox, meshes:mesh list) =
@@ -309,20 +324,24 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
             // List of meshes that intersect the partition
             [0..(meshes.Length-1)]
             |> List.collect(fun x -> IDList(x,BoxBoxIntersection(meshes.[x].Bbox, gbox)))
+        
+        let firstboolVinMeshes = // like boolVinMeshes with all the meshes and then boolVinMeshes is the selection
+            [0..(meshes.Length-1)]
+            |> List.collect(fun x -> [VertInside (gbox, meshes.[x])])
 
         let boolVinMeshes = //I define this strange name to diferentiate with boolv
             // List which contais:
             // After checking if the boxes are intersected I must know if there're vertices inside the partition
             // [[booleans of vertices of Mesh1];[booleans of vertices of Mesh2];...] 
-            FirstMeshListID  
-            |> List.collect(fun x -> [VertInside (gbox, meshes.[x])])
+            FirstMeshListID 
+            |> List.collect(fun x -> [firstboolVinMeshes.[x]]) 
         let (rayEdges,CubeMesh) = Edges2RayFrom(gbox)
         //printfn " CubeMesh: %+A" CubeMesh
         //let aaa = meshes.[2]
        
         //True meshes that have an intersection
         // let tinside (tri:int list, boolv:bool list,mesh:mesh, i:int,edgeRays:RayFrom list)= 
-        let (MeshListID,MeshTriangles) = RealMeshID(boolVinMeshes,meshes,FirstMeshListID,rayEdges,CubeMesh)//[0..FirstMeshListID.Length-1] 
+        let (MeshListID,MeshTriangles,MeshNormals) = RealMeshID(boolVinMeshes,meshes,FirstMeshListID,rayEdges,CubeMesh)//[0..FirstMeshListID.Length-1] 
                          //|>List.collect(fun x ->[( meshes.[x].Triangles,boolv.[x], rayEdges)])
                          //|> List.collect(fun x -> IDList(FirstMeshListID.[x],bol2.[x]))
         (*
@@ -337,14 +356,14 @@ let MeshToGrid (box:BBox, meshes:mesh list) =
             // Not the best, should be computed as the BBox of the triangles inside the partition
             // The current box may be much bigger than the required (CAn be seen on the paper)
             [0..(MeshListID.Length-1)] //MeshListID//
-            |>List.collect(fun x -> [SubMeshBox(meshes.[MeshListID.[x]],boolVinMeshes.[x],rayEdges,CubeMesh)])
+            |>List.collect(fun x -> [SubMeshBox(meshes.[MeshListID.[x]],firstboolVinMeshes.[MeshListID.[x]],rayEdges,CubeMesh)])
             (*  DISCOMMENT TO USE OLD 
             //|>List.collect(fun x ->[( meshes.[MeshListID.[x]],boolv.[x])])
             |>List.collect(fun x ->[( meshes.[x].Bbox,gbox)])
             |> List.collect(fun x -> [BoxofIntersection x]) 
             //|>List.collect(fun x -> [SubMeshBox x]) // BoxofIntersection (meshBox:BBox, partitionBox:BBox)
             *)
-        (MeshListID, MeshTriangles, MeshsubBoxes)
+        (MeshListID, MeshTriangles, MeshNormals, MeshsubBoxes)
         
     AllMeshesIter (box, meshes)
 
@@ -362,11 +381,24 @@ let SphereToGrid (box:BBox, sphs: sphere list) =
     let sphBBoxs = sphID|> List.collect(fun x -> [SphBBoxInBox (sphs.[x], box)]) 
     // SphBBoxInBox works because I already know it's inside
     (sphID,sphBBoxs)
-   
+let CylinderToGrid(box:BBox, cyls:cylinder list) =
+    // Copy and paste from SphereToGrid
+    let  IDList (i:int ,bol:bool) =
+        if bol then [i]
+        else []
+    let cylbool = [0..(cyls.Length-1)]  |> List.map(fun x -> BoxBoxIntersection(box,cyls.[x].WBbox))
+    let CylID = [0..(cyls.Length-1)] |> List.map(fun x -> (x, cylbool.[x]))
+                 |> List.collect(fun x -> IDList x) 
+    let cylBBox = CylID |> List.map(fun x -> BoxofIntersection(cyls.[x].WBbox,box))
+    (CylID,cylBBox)
+
+
+
+
 let Partitionate (world:world,part:int)=
     // The result must be a list of Grid3D
     let limits = WorldLimits (world) // Bounding box of all the elements that create the world
-    let (partx,party,partz) = (1,1,part)
+    let (partx,party,partz) = (part,part,part)
     let stepx = (limits.Pmax.[0]-limits.Pmin.[0])/float(partx)
     let stepy = (limits.Pmax.[1]-limits.Pmin.[1])/float(party)
     let stepz = (limits.Pmax.[2]-limits.Pmin.[2])/float(partz)
@@ -401,9 +433,10 @@ let Partitionate (world:world,part:int)=
                     let thisbox = {Pmin = [pxmin;pymin;pzmin] ;
                                    Pmax = [pxmax;pymax;pzmax] }
                     let (sphIDs,sphbox) = SphereToGrid (thisbox, world.Sphere)
-                    let (MeshesID,triangleslist,meshesbox) = MeshToGrid (thisbox, world.Meshes)
+                    let (MeshesID,triangleslist, normalslist,meshesbox) = MeshToGrid (thisbox, world.Meshes)
                     let partition = {Bbox = thisbox;
-                                     MeshID = MeshesID; MeshTriangles = triangleslist; MBBox = meshesbox; // Meshes
+                                     MeshID = MeshesID; MeshTriangles = triangleslist; MeshNormals= normalslist ;
+                                     MBBox = meshesbox; // Meshes
                                      SphID = sphIDs; SphBox = sphbox                                      // Spheres
                                      } 
                     //printfn "the hell is here: \n %+A" partition
@@ -418,7 +451,7 @@ let Partitionate (world:world,part:int)=
                     *)               
                     match (partition.MeshID,partition.SphID) with
                     | ([],[]) -> boxes <- boxes   //If empty don't create it
-                    | (_,_) -> printfn "%+A" partition
+                    | (_,_) -> //printfn "%+A" partition
                                boxes <- List.append boxes [partition] 
                                                 
         boxes

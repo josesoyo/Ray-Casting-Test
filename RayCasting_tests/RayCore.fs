@@ -6,7 +6,8 @@ open MathNet.Spatial.Euclidean // requieres System.Xml
 
 open RayType
 open BBox 
-
+open RayTypeMethods
+let PI = 3.1415926535897932384626433832795028841971693993751058209749445923078164062
 
 ///////////////////////////////////////////////////
 //
@@ -18,7 +19,7 @@ let pointAtTime (rayfrom:RayFrom, time:float) =
     rayfrom.from + rayfrom.uvec.ScaleBy(time) 
     //Ray3D.Direction.ScaleBy -> to multiply by a float
 
-let intersection(ray:RayFrom,sphere:sphere,nsamples:int)=
+let intersection_sphere(ray:RayFrom,sphere:sphere,nsamples:int)=
     //let s = ray.origin - scene.Sphere.center //raycast for sphere
     let s = ray.from - sphere.center //raycast for sphere
     let rayDir = ray.uvec //ray.Direction// Normalized direction of the ray3D
@@ -38,15 +39,168 @@ let intersection(ray:RayFrom,sphere:sphere,nsamples:int)=
 
 let castRay (scene:scene, ray:RayFrom) = 
     scene.World.Sphere 
-    |> List.collect (fun x -> intersection(ray, x,scene.Nsamples))  // Find interstion with all the spheres
-    |> List.filter (fun x -> x.t > 0.01)             // Select the ones that are not negative-€[e,infinity)
+    |> List.collect (fun x -> intersection_sphere(ray, x,scene.Nsamples))  // Find interstion with all the spheres
+    |> List.filter (fun x -> x.t > 1e-10)             // Select the ones that are not negative-€[e,infinity)
+    |> List.filter(fun x -> x.t < x.ray.length)     // If is further no intersection with light, the ray.length means the distance to a light in RayColor.fs
+
+//////////////////////////
+//
+//  Partial spheres
+//
+//////////////////////////
+
+let phi  y x =
+    // Gives the angle of spherical coordinates in (0,2*pi)
+    let prephi = atan2 y x
+    if prephi > 0. then prephi
+    else prephi+ 2.*PI //Because it goes from -pi to +pi
+// Cast the partial sphere
+let intersect_PartSphere(ray:RayFrom,psphere:partSphere,nsamples:int) =
+    let sphere = psphere.Sphere
+    let intersec_sphere = intersection_sphere(ray,sphere,nsamples)
+    match intersec_sphere with
+    | [] -> []
+    | _ -> let translate = sphere.center.ToVector3D().Negate()
+           //printfn "Intersecta somewhere"
+           let intersect_points = intersec_sphere 
+                                  |> List.collect(fun x -> [x.point+translate])                     // Translate
+                                  |> List.collect(fun x -> [x.TransformBy(m=psphere.WorldToObj)])   // Rotate
+           let phiAndzlist = intersect_points |> List.map(fun x -> ((phi x.Y x.X), x.Z)) // get angles of intersection in uv
+           //let zlist = intersect_points |> List.map(fun x -> x.Z)
+
+           // Conditions for intersection with the partial sphere
+           let cond (phi, z) =
+            // Intersects or not?
+            if z> psphere.zmin && z < psphere.zmax then 
+                if phi> psphere.phimin && phi < psphere.phimax then true
+                else false
+            else false
+
+           let part_int (intersec:Intersection,bol:bool)=  
+            if bol then [intersec]
+            else []
+           let bool = phiAndzlist |> List.map(fun x -> cond x) // Bools for the intersection list
+           //printfn "phi and z are: %+A" phiAndzlist
+           //printfn "The points are: %+A" intersect_points
+           //printfn "bols are: %+A" bool
+           List.map2(fun x y -> part_int(x, y)) intersec_sphere bool
+           |> List.collect(fun x -> x)                                  //Required to solve problem of Intersection list list
+
+
+let castRay_PartSphere (scene:scene, ray:RayFrom) = 
+    scene.World.PartSphere
+    |> List.collect (fun x -> intersect_PartSphere(ray, x,scene.Nsamples))  // Find interstion with all the cylinders
+    |> List.filter (fun x -> x.t > 1e-10)           // Select the ones that are not negative-€[e,infinity)
+    |> List.filter(fun x -> x.t < x.ray.length)     // If is further no intersection with light, the ray.length means the distance to a light in RayColor.fs
+
+////
+//Cast the surface of a lens (sphere with a max dia)
+////           
+let intersect_SurfLens(ray:RayFrom,psphere:SphSurfaceLens,nsamples:int) =
+    let sphere = psphere.Sphere
+    let intersec_sphere = intersection_sphere(ray,sphere,nsamples)
+    match intersec_sphere with
+    | [] -> []
+    | _ -> let intersect_costh = intersec_sphere 
+                                  |> List.collect(fun x -> [psphere.Axis.DotProduct(x.normal)])
+           
+           //[x.normal.DotProduct(psphere.Axis)])       //  Get the normal x.normal.DotProduct(pshere.Axis)
+           //let cosmin = psphere.CosMin
+           // Conditions for intersection with the partial sphere - Surface lens
+           let cond(costh:float) =
+             // Intersects or not?
+             if costh < 1. && costh > psphere.CosMin then true
+             else false
+           let normalConcave(intersection:Intersection,psphere:SphSurfaceLens) =
+            // If we the lens is not convex changes the sign og the normal since it's defined for convec
+            if psphere.Convex then intersection
+            else
+                {normal=intersection.normal.Negate();point=intersection.point;ray=intersection.ray;
+                 material=intersection.material;t=intersection.t; Nsamples=intersection.Nsamples}
+
+           let part_int (intersec:Intersection,bol:bool)=  
+            // compares with the boof if it's intersection or not with the part
+            if bol then [intersec]
+            else []
+           let bool = intersect_costh |> List.map(fun x -> cond x) // Bools for the intersection list
+           // Result of intersections of the sph
+           List.map2(fun x y -> part_int(x, y)) intersec_sphere bool
+           |> List.collect(fun x -> x)                       //Required to solve problem of Intersection list list
+           |> List.map(fun x -> normalConcave(x,psphere))    // Changes the normal  if the surface is concave
+
+let castRay_SurfLens (scene:scene, ray:RayFrom) = 
+    scene.World.SurfaceLens
+    |> List.collect (fun x -> intersect_SurfLens(ray, x,scene.Nsamples))  // Find interstion with all the cylinders
+    |> List.filter (fun x -> x.t > 1e-10)           // Select the ones that are not negative-€[e,infinity)
+    |> List.filter(fun x -> x.t < x.ray.length)     // If is further no intersection with light, the ray.length means the distance to a light in RayColor.fs
+
+
+
+
+//////////////////////////
+//
+// Intersection for Cylinders
+//
+//////////////////////////
+
+
+let intersect_cyl(ray:RayFrom,cylinder:cylinder,nsamples:int) =
+    //Intersection with cylinder, it must be done in local coordinates
+    let radius = cylinder.Radius
+    // Functions required
+
+    // Transform ray to object space - Origin and then rotate to align with axis of z cylinder
+    let newRayOriginObject = (ray.from-cylinder.Origin).ToPoint3D().TransformBy(m=cylinder.WorldToObj)
+    let newRayDirObject = ray.uvec.TransformBy(m=cylinder.WorldToObj)                   // Rotate direction
+    
+    //Compute cylinder quadratic coeficients
+    let A = newRayDirObject.X*newRayDirObject.X+newRayDirObject.Y*newRayDirObject.Y
+    let B = 2.*(newRayDirObject.X*newRayOriginObject.X+newRayDirObject.Y*newRayOriginObject.Y)
+    let C = newRayOriginObject.X*newRayOriginObject.X+newRayOriginObject.Y*newRayOriginObject.Y-radius*radius 
+
+    //Solve equation  for t values
+    let disc = B*B-4.*A*C
+    if disc < 0. then []
+    else
+        let sdisc = sqrt(disc)
+        let t1 = 0.5*(-B + sdisc)/A   // A is not normalized since A not Mod(RaydirObjec)
+        let t2 = 0.5*(-B- sdisc)/A
+        let z1 = (newRayOriginObject + newRayDirObject.ScaleBy(t1) )//.ToPoint3D()
+        let z2 = (newRayOriginObject + newRayDirObject.ScaleBy(t2))//.ToPoint3D()
+        // Create the intersections
+        let inter1 = 
+            if (z1.Z < cylinder.zmax) && (z1.Z >= cylinder.zmin) then 
+                let normalt1 = (Vector3D(z1.X,z1.Y,0.).TransformBy(m=cylinder.ObjToWorld)).Normalize()
+                let ray1 =  {uvec=ray.uvec; length=ray.length; from=ray.from; travelled=(t1+ray.travelled)}
+                let z1real = 
+                    let z1rot = z1.TransformBy(m=cylinder.ObjToWorld)
+                    Point3D(z1rot.X+cylinder.Origin.X, z1rot.Y+cylinder.Origin.Y, z1rot.Z+cylinder.Origin.Z)
+                [{ normal = normalt1 ; point = z1real; ray = ray1 ; material=cylinder.material; t=t1;Nsamples=nsamples}]
+            else []
+        let inter2 = 
+            if (z2.Z < cylinder.zmax) && (z2.Z >= cylinder.zmin) then 
+                let normalt2 = (Vector3D(z2.X,z2.Y,0.).TransformBy(m=cylinder.ObjToWorld)).Normalize()
+                let ray2 =  {uvec=ray.uvec; length=ray.length; from=ray.from; travelled=(t2+ray.travelled)}
+                let z2real = 
+                    let z2rot = z2.TransformBy(m=cylinder.ObjToWorld)
+                    Point3D(z2rot.X+cylinder.Origin.X, z2rot.Y+cylinder.Origin.Y, z2rot.Z+cylinder.Origin.Z)
+                [{ normal = normalt2 ; point = z2real; ray = ray2 ; material=cylinder.material; t=t2;Nsamples=nsamples}]
+            else []
+        List.append inter1 inter2   
+
+
+
+let castRay_cyl (scene:scene, ray:RayFrom) = 
+    scene.World.Cylinder
+    |> List.collect (fun x -> intersect_cyl(ray, x,scene.Nsamples))  // Find interstion with all the cylinders
+    |> List.filter (fun x -> x.t > 1e-10)           // Select the ones that are not negative-€[e,infinity)
     |> List.filter(fun x -> x.t < x.ray.length)     // If is further no intersection with light, the ray.length means the distance to a light in RayColor.fs
 
 //////////////////////////
 //
 // Intersection for Meshes
-// Not implemented yet, but intersection can handle triangles and squares as a primitives now
-// Square used on Sensor for fowrard ray tracing
+// Intersection of a Square primitive used on Sensor for fowrard ray tracing
+//
 //////////////////////////
 
 let intersec_mesh (ray:RayFrom,  mesh:mesh,triangle:int list,nrm:UnitVector3D, nsamples:int, shape:char)= // normal is only passing
@@ -103,7 +257,7 @@ let castRay_mesh (scene:scene, ray:RayFrom) = //here it's only for sphere
     let interceptions (ray:RayFrom, mesh:mesh,nsamples)  =
         [0..(List.length(mesh.Triangles)-1)]
         |> List.collect (fun x -> intersec_tri(ray, mesh, mesh.Triangles.[x],mesh.normals.[x],nsamples))
-        |> List.filter (fun x -> x.t > 0.01)  //
+        |> List.filter (fun x -> x.t > 1e-10)  //
     // Meshes_intersections = castRay_mesh(scene,ray)
     let CastBBox(mesh:mesh,ray:RayFrom) =
         let bolean = BBox_intersec( mesh.Bbox, ray) 
@@ -137,4 +291,9 @@ let castRay_mesh (scene:scene, ray:RayFrom) = //here it's only for sphere
 let CastRay_nest(scene:scene, ray:RayFrom) =
     let Spheres_intersections = castRay(scene,ray) //_sphere
     let Meshes_intersections = castRay_mesh(scene,ray)
-    List.append Spheres_intersections Meshes_intersections //append is 2 lists
+    let Cylinder_intersections = castRay_cyl(scene,ray)
+    let PartSpheres_intersections = castRay_PartSphere (scene, ray)
+    let SurfaceLens = castRay_SurfLens (scene, ray)
+
+    let first = List.append Spheres_intersections Meshes_intersections //append is 2 lists
+    first@Cylinder_intersections@PartSpheres_intersections@SurfaceLens

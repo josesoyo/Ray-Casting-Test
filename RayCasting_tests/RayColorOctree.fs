@@ -1,16 +1,4 @@
-﻿module RayColorGrid
-//
-//  Things of this module:
-//  ColorAt -> Shadowing funtion
-//              Includes: -Direct illumination from:
-//                                  *Point lights
-//                                  *Circular lights (sampling them and generating equivalent Plights)
-//                        -Diffuse (N·L) and Specular (L·R)
-//  Global Illumination methods:
-//      The number of iteration/branches defined here ---> Should be modified in the future
-//      Reflection/Transmision 
-//      Transmitted and Reflected via Fresnel coeficient can be computed
-//
+﻿module RayColorOctree
 
 open MathNet.Numerics.LinearAlgebra
 open MathNet.Spatial.Euclidean // requieres System.Xml
@@ -18,72 +6,11 @@ open MathNet.Spatial.Euclidean // requieres System.Xml
 open RayCore
 open RayType
 open RandomMethods
-open RayCoreGrid
-
-(*let colorAt (intersection:Intersection,scn:scene )=
-    // Here is the function that defines the shader
-    (*
-    //As a starting I want to obtain only the dot product
-    let FirstShading (sphere:sphere, ray:RayFrom)=
-        let dotproduct= ray.ray.Direction.DotProduct(intersection.normal)
-        let colore = sphere.color*sqrt(dotproduct*dotproduct) //Must be positive
-        colore
-    FirstShading (intersection.sphere, intersection.ray)*)
-    // I want to implement the Phong model:
-    //      I = Ia*Ka*Od+Fatt*Ipoint[Kd*Od(N·L)+Ks*Os(R·V)^n]
-    //                  Ka+Kd+Ks<=1
-    //                  Ka=0.1*(rgb)
-    //                  Kd=sphere.color(rgb)
-    //                  Ks=0.5*(rgb) -> first instance is white
-    //Ambient light
-    let Fatt intersection light=
-        // attenuator for distance
-        let LightDist = (light.origin - intersection.point).Length
-        let distance  = intersection.ray.travelled + LightDist
-        //printfn "the .t is: %f and the ray.travelled: %f" intersection.t intersection.ray.travelled
-        List.min([1.0/(distance*distance); 1.0])
-        //1.0
-    let light = scn.Light
-    let Ia = Color(0.05,0.05,0.05) //Should be defined with the scene
-    let AmbLight = Ia*intersection.material.DiffuseLight //Ia*Ka*Od
-    let IsShadow intersection light =
-        let LightDir = light.origin - intersection.point
-        let RayLight = {uvec=LightDir.Normalize();length=LightDir.Length; from=intersection.point; travelled=intersection.ray.travelled}
-        let intersects = CastRay_nest (scn, RayLight)
-        //printfn "there's an intersection at: %f" intersects.Head.ray.travelled
-        match intersects with
-            |[] -> true
-            |_ ->  false
-    // Diffuse
-    let DiffLight intersection light    =
-        let KdOd = intersection.material.DiffuseLight
-        let LightDir = light.origin - intersection.point
-        let NormLightDir = LightDir.Normalize() //dir from point to light
-        let Id = light.color* List.max([intersection.normal.DotProduct(NormLightDir);0.0])
-        let fatt= Fatt intersection light
-        //printfn "Distance travelled is: %f" fatt
-        if IsShadow intersection light then KdOd*Id*fatt*light.intensity //Id*Kd*Od
-        else Color(0.0,0.0,0.0)
-    //Specular
-    let SpecLight intersection light =
-        let Ks =  intersection.material.SpecularLight //reflectance specular - MODIFY IT in FUTURE
-        let LightDir = light.origin - intersection.point
-        let NormLightDir = LightDir.Normalize() //dir from point to light
-        let Rvect = intersection.normal.ScaleBy(2.0*intersection.normal.DotProduct(NormLightDir))-NormLightDir
-        let DotProds = List.max([Rvect.DotProduct(intersection.ray.uvec.ScaleBy(-1.0));0.0])
-        let Is = light.color *pown DotProds intersection.material.shinness
-        let fatt= Fatt intersection light
-        if IsShadow intersection light then Ks*Is*fatt*light.intensity
-        else Color(0.0,0.0,0.0)
-    // Sum
-
-    let DiffSimp light = DiffLight intersection light
-    let SpecSimp light = SpecLight intersection light    
+open Octree
+open RayCoreOctree
 
 
-    AmbLight + List.sumBy(fun x -> DiffSimp x) light + List.sumBy(fun x -> SpecSimp x) light
-*)
-let colorAtGrid (intersection:Intersection,scn:scene,partition:Grid3D list)=
+let colorAtOctree (intersection:Intersection,scn:scene,octree:OctreeSystem list)=
     // Here is the function that defines the shader
     (*
     //As a starting I want to obtain only the dot product
@@ -142,12 +69,12 @@ let colorAtGrid (intersection:Intersection,scn:scene,partition:Grid3D list)=
         Ks*Is*fatt*light.intensity//if IsShadow intersection light then Ks*Is*fatt*light.intensity
         //else Color(0.0,0.0,0.0)
     // Sum
-    let IsShadow partition intersection light =
+    let IsShadow octree intersection light =
         // If LightDir.Length = 1 the function will FAIL
         let LightDir = light.origin - intersection.point
         let NormLightDir = LightDir.Normalize()
         let RayLight = {uvec=NormLightDir; from=intersection.point; length=LightDir.Length; travelled=intersection.ray.travelled}
-        let intersects = Cast_3DGrid(scn, RayLight,partition)//CastRay_nest//CastRay_nest (scn, RayLight)
+        let intersects = Cast_Octree(scn, RayLight,octree)//CastRay_nest//CastRay_nest (scn, RayLight)
         //printfn "there's an intersection at: %f" intersects.Head.ray.travelled
         match intersects with
             |[] -> let fatt= Fatt intersection light //let unit = paralel intersection
@@ -155,7 +82,7 @@ let colorAtGrid (intersection:Intersection,scn:scene,partition:Grid3D list)=
             |_ ->  Color(0.0,0.0,0.0)
     //let DiffSimp light = DiffLight intersection light
     //let SpecSimp light = SpecLight intersection light    
-    let OneShadow light = IsShadow partition intersection light
+    let OneShadow light = IsShadow octree intersection light
 
     let ExtendedLight (intersection, clight:Clight) =
         // Only Circle light
@@ -221,17 +148,17 @@ let RFresnel (ci:float, ct:float, nu:float) =
 //
 //  GLOBAL ILLUMINATION
 //
-let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int,partition:Grid3D list) =
+let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int,octree:OctreeSystem list) =
     let RayDir = intersection.ray.uvec
     let NormLightDir = RayDir.Negate()//.ScaleBy(-1.0) //Inverse of the ray direction to reflect
     let ReflRayv = intersection.normal.ScaleBy(2.0*intersection.normal.DotProduct(NormLightDir))-NormLightDir //Reflected ray it's unit
     let ReflRay = {uvec=ReflRayv.Normalize(); length=infinity; from =intersection.point;travelled=intersection.ray.travelled}
     // Ray.length is created to allow shadows, it's not required more, so it creates a problem if it's not infinity intersecting objects
-    let intersects = Cast_3DGrid(scene,  ReflRay,partition)//CastRay_nest//CastRay_nest (scene, ReflRay)
+    let intersects = Cast_Octree(scene,  ReflRay,octree)//CastRay_nest//CastRay_nest (scene, ReflRay)
     match intersects with
         |[] -> Color(0.0,0.0,0.0) // No reflection returns black             
         |_ -> let intersecMin = (intersects |>List.minBy(fun x -> x.t) ) //colorvar//Intersection
-              let rcolor= colorAtGrid(intersecMin, scene,partition)
+              let rcolor= colorAtOctree(intersecMin, scene,octree)
               let Depth = dpt + 1
               let LenghtMax = 400.0
               if intersection.ray.travelled < LenghtMax && Depth < 2 then
@@ -245,13 +172,13 @@ let rec ReflectedRay (intersection:Intersection,scene:scene,dpt:int,partition:Gr
                         RFresnel(ci,cr,nu)
                     
                 
-                if T=0. then rcolor+ReflectedRay(intersecMin,scene,Depth,partition)*R
-                else rcolor+ReflectedRay(intersecMin,scene,Depth,partition)*R+TransmittedRay(intersecMin,scene,Depth,partition)*T
+                if T=0. then rcolor+ReflectedRay(intersecMin,scene,Depth,octree)*R
+                else rcolor+ReflectedRay(intersecMin,scene,Depth,octree)*R+TransmittedRay(intersecMin,scene,Depth,octree)*T
                
               else
                 rcolor
 
-and TransmittedRay (intersection:Intersection,scene:scene,dpt:int,partition:Grid3D list) =
+and TransmittedRay (intersection:Intersection,scene:scene,dpt:int,octree:OctreeSystem list) =
     let RayDir = intersection.ray.uvec
     let LightDir = RayDir.Negate() //Ray that incides on the surface * -1
     let SideRay (ci,index, nrm:UnitVector3D) =   
@@ -282,14 +209,14 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int,partition:Grid
 
     if ang_inc < ang_critic then // TIR
         let cos_trans = sqrt(1.-(inv_n*inv_n )*(1.-cos_inc*cos_inc)) // Cosinus transmited
-        let vtrans = RayDir.ScaleBy(inv_n) - normal.ScaleBy(cos_trans - inv_n*cos_inc)
+        let vtrans = RayDir.ScaleBy(inv_n) - normal.ScaleBy(cos_trans - inv_n*cos_inc) // intersection.normal
         let TransRay = {uvec=vtrans.Normalize();length=infinity; from =intersection.point;travelled=intersection.ray.travelled}
         // Ray.length is created to allow shadows, it's not required more, so it creates a problem if it's not infinity intersecting objects
-        let intersects = Cast_3DGrid(scene, TransRay,partition)//CastRay_nest (scene, TransRay)
+        let intersects = Cast_Octree(scene, TransRay,octree)//CastRay_nest (scene, TransRay)
         match intersects with
             |[] -> Color(0.0,0.0,0.0)
             |_ -> let intersecMin = (intersects |>List.minBy(fun x -> x.t) )
-                  let tcolor = colorAtGrid(intersecMin, scene,partition)
+                  let tcolor = colorAtOctree(intersecMin, scene,octree)
                   let Depth = dpt + 1 //Idem as reflected
                   let LenghtMax = 400.0
                   if intersection.ray.travelled < LenghtMax && Depth < 2 then
@@ -300,15 +227,15 @@ and TransmittedRay (intersection:Intersection,scene:scene,dpt:int,partition:Grid
                             // Hall illumination model[HALL83]
                             RFresnel(cos_inc,cos_trans,nu)
                                                    
-                      if T=0. then tcolor + ReflectedRay(intersecMin,scene,Depth,partition)*R // Don't do trans f not trans next collision
-                      else tcolor + TransmittedRay(intersecMin,scene,Depth,partition)*T + ReflectedRay(intersecMin,scene,Depth,partition)*R
+                      if T=0. then tcolor + ReflectedRay(intersecMin,scene,Depth,octree)*R // Don't do trans f not trans next collision
+                      else tcolor + TransmittedRay(intersecMin,scene,Depth,octree)*T + ReflectedRay(intersecMin,scene,Depth,octree)*R
                   else
                       tcolor
     else
        Color(0.0,0.0,0.0) // Total Internal Reflection
  
-let GlobalIllum (intersection:Intersection, scene:scene,partition:Grid3D list) =
-    let DirColor = colorAtGrid(intersection, scene,partition) //First  direct color
+let GlobalIllum_Octree (intersection:Intersection, scene:scene,octree:OctreeSystem list) =
+    let DirColor = colorAtOctree(intersection, scene,octree) //First  direct color
     let (T, R) = 
         //Whitte ilumination model
         if intersection.material.Fresnel = false then (intersection.material.T, intersection.material.R)
@@ -316,6 +243,6 @@ let GlobalIllum (intersection:Intersection, scene:scene,partition:Grid3D list) =
             // Hall illumination model[HALL83]
            let (ci,cr,nu)= cosinus_in_tr (intersection.normal, intersection.ray.uvec.Negate(), intersection.material.n)
            RFresnel(ci,cr,nu)
-    let RefColor = ReflectedRay (intersection,scene,0,partition)*R // Generate ray reflected
-    let TransColor = TransmittedRay (intersection,scene,0,partition)*T //Generate Ray transmited
+    let RefColor = ReflectedRay (intersection,scene,0,octree)*R // Generate ray reflected
+    let TransColor = TransmittedRay (intersection,scene,0,octree)*T //Generate Ray transmited
     DirColor+RefColor+ TransColor
