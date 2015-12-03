@@ -110,14 +110,7 @@ let RotateMesh mesh nrm =
   let rotateSource (nrm:UnitVector3D) =
     //Generate a rotation matrix
     Matrix3D.RotationTo(UnitVector3D(0.,0.,1.),nrm)
-<<<<<<< HEAD
 
-  let rvert( vert:Point3D list, nrm:UnitVector3D) =
-    let matRot = rotateSource(nrm) 
-    vert |> List.collect(fun x -> [x.TransformBy(m=matRot)])
-
-  {Vertices = rvert(mesh.Vertices, nrm); Triangles = mesh.Triangles; material = mesh.material; normals= mesh.normals;Bbox=mesh.Bbox}
-=======
   let matRot = rotateSource(nrm) 
   let rvert( vert:Point3D list, nrm:UnitVector3D, matRot) =
     
@@ -131,5 +124,4 @@ let RotateMesh mesh nrm =
    material = mesh.material; 
    normals= rnormals(mesh.normals, nrm,matRot);
    Bbox=mesh.Bbox}
->>>>>>> origin/ForwarAndBackward
 
