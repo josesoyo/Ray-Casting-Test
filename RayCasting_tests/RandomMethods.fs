@@ -14,6 +14,7 @@ open BBox
 //  -unit Hemisphere Method:  SampUnitHemisphereToCart
 //  -triangle (u,v):          SampTriangle
 //  -Gaussian Number X2       Samp2Gauss
+//  -Blinn brdf
 
 open MathNet.Numerics.Random;
 let PI = double(3.1415926535897932384626433832795028841971693993751058209749445923078164062)
@@ -98,3 +99,23 @@ Chart.Combine(
 *)
 //Endtest
 
+let SampBlinnDist(e:int) =
+    // The methods samples a halfway vector followinf the distribution
+    // On local corrdinates -> Hemisfere +z
+    // Carefull, because to know the pdf another methods should be used
+    let samples = Random.doubles 2
+    let phi = 2.*PI*samples.[0] 
+    let costhHalf = (samples.[1])**(1./float(e))  
+    let sinthHalf = max 0. (1.-costhHalf*costhHalf)
+    let (x,y,z) = (sinthHalf*cos(phi), sinthHalf*sin(phi),abs costhHalf) // Carefull with the ABS on Z !!
+    UnitVector3D(x,y,z)
+    
+let Blinn_pdf(wi:UnitVector3D,wo:UnitVector3D,e:int) =
+    // blinn pfd value for a pair of input directon and output direction
+    let wh = (wi+wo).Normalize()   // HalfWay vector
+    let costh = abs wh.Z           // the cos is the z part
+    let blinn_pdf = 
+        let dot = wo.DotProduct(wh)
+        if dot > 0. then (float(e)+1.)*(pown costh e)/(2.*PI*4.*dot)
+        else 0.
+    blinn_pdf
