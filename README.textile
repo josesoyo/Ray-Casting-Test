@@ -1,6 +1,7 @@
 
-#Render code written in F#.
-The point of this branch is to implement different optimization methods in order to reduce the time searching for intersections.
+Backward ray tracing and forward ray tracing have been implemented on this code. The backward ray tracing part is a rendering engine with many primitive types for lights and objects that can be used. The first part explain a little bit the capabilities of the render engine and after that the forward ray tracing part is presented
+
+**Render code written in F# **
 
 It can manage:
 - Extended lights added as a circular light - directionality added.
@@ -24,8 +25,13 @@ https://pbs.twimg.com/media/CPgkkPCXAAARioP.png
 Script: Test_AllScene_ExtendedSource.fsx
 
 
-Simple ForwardRayTracing implemented on Test_ForwardRay.fsx and Sensor.fs
-The two nect cases have been tested:
+**Forward Ray tracing implemented in the folder with the same name**
+The forward ray tracing module in mainly written to simulate wave effects of light. With this module many things can be simulated:
+- Interferometer configuration (there are some Michelson interferometers scripts)
+- Gaussian profile of the beams diverging with an specified radius of curvature.
+- Also incoherent transmision and reflection of light are in included on the code. 
+
+
 !https://pbs.twimg.com/media/CQzwhDFWoAAb0IB.png(Testlist)! !https://pbs.twimg.com/media/CQzwhDHWsAAP9BU.png(Testlist)!
 
 --------------------------------------------------------------
@@ -42,5 +48,3 @@ Before fresnel reflection was included:
 Similar now:
 !https://pbs.twimg.com/media/CN5hURNXAAA5F7u.png(Textlist)!
  
-
-The local Paths of the .obj mesh files must be changed on the script and on the program.fs,I don't know (yet) how to specify the local  path.
