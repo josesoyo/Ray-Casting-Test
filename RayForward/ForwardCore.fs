@@ -94,7 +94,7 @@ let ReflectedRay (ray:RayForward, intersection) =
     //printfn "%+A" (Reflvect.Normalize())
     let newvect = Reflvect.Normalize()
     {uvec=newvect; mlength=ray.mlength; 
-    from=intersection.point; travelled=(intersection.t+ray.travelled+(1.e-6/2.)); 
+    from=intersection.point; travelled=(intersection.t+ray.travelled+(0.5e-6/2.)); 
     color=ray.color; intensity=1.}
     //
         
